@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Future State — Capability + Technology Map v4</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --bg:#fff; --bg2:#f5f4f0; --text:#1a1a18; --text2:#5f5e5a; --text3:#9a9890; --border:rgba(0,0,0,0.1); --border2:rgba(0,0,0,0.18); }
+@media(prefers-color-scheme:dark){ :root { --bg:#1c1c1a; --bg2:#252522; --text:#e8e6de; --text2:#9a9890; --text3:#66655f; --border:rgba(255,255,255,0.09); --border2:rgba(255,255,255,0.16); } }
+body { font-family:'Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--text); padding:2rem 1.5rem; max-width:980px; margin:0 auto; min-height:100vh; }
+.top-bar { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:8px; }
+.brand-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+.bp { padding:4px 14px; border-radius:999px; font-size:11px; font-weight:500; }
+.b-jh    { background:#E6F1FB; color:#0C447C; border:.5px solid #85B7EB; }
+.b-tt    { background:#EAF3DE; color:#27500A; border:.5px solid #97C459; }
+.b-cross { background:#EEEDFE; color:#3C3489; border:.5px solid #AFA9EC; }
+.plus    { font-size:14px; color:var(--text3); }
+.page-title { font-size:18px; font-weight:500; color:var(--text); margin-bottom:3px; }
+.page-sub { font-size:12px; color:var(--text3); }
+.reset-btn { font-size:11px; font-weight:500; padding:6px 16px; border-radius:999px; border:.5px solid var(--border2); background:var(--bg2); color:var(--text2); cursor:pointer; transition:all .15s; white-space:nowrap; flex-shrink:0; }
+.reset-btn:hover { background:var(--bg); color:var(--text); }
+.filter-bar { display:flex; gap:14px; margin-bottom:1rem; flex-wrap:wrap; align-items:flex-start; }
+.filter-group { display:flex; flex-direction:column; gap:5px; }
+.filter-group-label { font-size:10px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--text3); }
+.filter-chips { display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
+.aud-chip { font-size:11px; padding:4px 11px; border-radius:999px; border:.5px solid; cursor:pointer; white-space:nowrap; user-select:none; transition:opacity .15s, transform .12s, box-shadow .15s; display:inline-flex; align-items:center; gap:4px; }
+.aud-chip:hover { opacity:.8; }
+.aud-chip.on { box-shadow:0 0 0 2px currentColor; transform:scale(1.04); font-weight:500; }
+.aud-demand  { background:#FAECE7; color:#993C1D; border-color:#F0997B; }
+.aud-channel { background:#E1F5EE; color:#0F6E56; border-color:#5DCAA5; }
+.aud-enable  { background:#EEEDFE; color:#3C3489; border-color:#AFA9EC; }
+.aud-dev { font-size:10px; opacity:.7; }
+.dev-chip { font-size:11px; padding:4px 12px; border-radius:999px; border:.5px solid var(--border2); cursor:pointer; white-space:nowrap; user-select:none; transition:all .15s; background:var(--bg2); color:var(--text2); display:inline-flex; align-items:center; gap:5px; }
+.dev-chip:hover { color:var(--text); }
+.dev-chip.on { background:var(--bg); color:var(--text); box-shadow:0 0 0 1.5px var(--border2); font-weight:500; }
+.filter-sep { width:.5px; background:var(--border); align-self:stretch; margin:0 2px; }
+.sel-summary { font-size:11px; color:var(--text2); margin-bottom:1rem; min-height:18px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.caps-list { display:flex; flex-direction:column; gap:8px; }
+.cap-section { border:.5px solid var(--border); border-radius:12px; overflow:hidden; background:var(--bg); transition:border-color .15s, opacity .2s; }
+.cap-section.active { border-color:var(--cap-color); }
+.cap-section.dimmed { opacity:.18; pointer-events:none; }
+.cap-section-header { padding:12px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; background:var(--bg2); transition:background .15s; }
+.cap-section-header:hover { background:var(--bg); }
+.cap-icon-wrap { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.cap-header-name { font-size:12px; font-weight:500; color:var(--text); margin-bottom:2px; }
+.cap-header-desc { font-size:10px; color:var(--text2); }
+.cap-header-auds { display:flex; gap:3px; flex-wrap:wrap; margin-top:5px; }
+.cap-header-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+.cap-meta-counts { font-size:10px; color:var(--text3); white-space:nowrap; }
+.cap-meta-counts span { font-weight:500; color:var(--text2); }
+.cap-chevron { font-size:14px; color:var(--text3); transition:transform .2s; flex-shrink:0; }
+.cap-chevron.open { transform:rotate(180deg); }
+.cap-body { display:none; padding:12px 14px 4px; border-top:.5px solid var(--border); }
+.cap-body.open { display:block; }
+.body-section-label { font-size:10px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--text3); margin-bottom:8px; }
+.tech-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+@media(max-width:580px){ .tech-grid,.future-tech-grid{ grid-template-columns:repeat(2,1fr); } }
+.tech-card { background:var(--bg2); border:.5px solid var(--border); border-radius:8px; padding:10px; }
+.future-tech-card { background:var(--bg2); border:.5px solid var(--border2); border-radius:8px; padding:10px; }
+.tc-top { display:flex; align-items:center; gap:6px; margin-bottom:5px; }
+.tc-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.tc-name { font-size:11px; font-weight:500; color:var(--text); line-height:1.3; flex:1; }
+.tc-desc { font-size:10px; color:var(--text2); line-height:1.45; margin-bottom:6px; }
+.tc-tags { display:flex; gap:4px; flex-wrap:wrap; }
+.tag { font-size:9px; padding:2px 6px; border-radius:999px; font-weight:500; white-space:nowrap; }
+.tag-jh    { background:#E6F1FB; color:#0C447C; border:.5px solid #85B7EB; }
+.tag-tt    { background:#EAF3DE; color:#27500A; border:.5px solid #97C459; }
+.tag-cross { background:#EEEDFE; color:#3C3489; border:.5px solid #AFA9EC; }
+.tag-mob   { background:#EAF3DE; color:#0F6E56; border:.5px solid #5DCAA5; }
+.tag-desk  { background:#E6F1FB; color:#0C447C; border:.5px solid #85B7EB; }
+.tag-both  { background:#FAEEDA; color:#633806; border:.5px solid #EF9F27; }
+.tag-type  { background:var(--bg); color:var(--text2); border:.5px solid var(--border2); }
+.s-active{background:#639922;} .s-emerging{background:#BA7517;} .s-concept{background:#888780;} .s-adopt{background:#185FA5;} .s-consolidate{background:#993556;} .s-existing{background:#378ADD;}
+.future-block { margin-top:12px; border-radius:10px; border-width:1.5px; border-style:solid; overflow:hidden; }
+.future-block-header { padding:8px 12px; display:flex; align-items:center; gap:8px; }
+.future-block-title { font-size:10px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; }
+.future-block-badge { font-size:10px; font-weight:500; padding:2px 9px; border-radius:999px; color:#fff; }
+.future-tech-grid { padding:8px 10px 10px; display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.future-rec { border-radius:8px; padding:9px 12px; margin:0 10px 12px; font-size:11px; line-height:1.6; border:.5px solid; }
+.future-rec strong { font-weight:500; display:block; margin-bottom:3px; font-size:11px; }
+.legend { display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; padding-top:12px; border-top:.5px solid var(--border); }
+.leg { display:flex; align-items:center; gap:4px; font-size:10px; color:var(--text3); }
+.leg-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div>
+    <div class="brand-row">
+      <span class="bp b-jh">James Hardie</span>
+      <span class="plus">+</span>
+      <span class="bp b-tt">TimberTech / AZEK</span>
+    </div>
+    <div class="page-title">Future state — capabilities + technology stack</div>
+    <div class="page-sub">Filter by audience or device, or just click any capability row to expand it</div>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">Reset</button>
+</div>
+
+<div class="filter-bar">
+  <div class="filter-group">
+    <div class="filter-group-label">Audience</div>
+    <div style="display:flex;flex-direction:column;gap:5px;">
+      <div class="filter-chips">
+        <span style="font-size:10px;color:var(--text3);font-weight:500;min-width:52px;align-self:center">Demand</span>
+        <span class="aud-chip aud-demand"  data-aud="Homeowners">Homeowners <span class="aud-dev">📱</span></span>
+        <span class="aud-chip aud-demand"  data-aud="Architects / Designers">Architects <span class="aud-dev">🖥</span></span>
+        <span class="aud-chip aud-demand"  data-aud="Builders">Builders <span class="aud-dev">⬡</span></span>
+      </div>
+      <div class="filter-chips">
+        <span style="font-size:10px;color:var(--text3);font-weight:500;min-width:52px;align-self:center">Channel</span>
+        <span class="aud-chip aud-channel" data-aud="Contractors">Contractors <span class="aud-dev">⬡</span></span>
+        <span class="aud-chip aud-channel" data-aud="Installers / Crews">Installers <span class="aud-dev">📱</span></span>
+        <span class="aud-chip aud-channel" data-aud="Dealers">Dealers <span class="aud-dev">🖥</span></span>
+        <span class="aud-chip aud-channel" data-aud="Distributors">Distributors <span class="aud-dev">🖥</span></span>
+        <span class="aud-chip aud-channel" data-aud="Retail Partners">Retail <span class="aud-dev">🖥</span></span>
+      </div>
+      <div class="filter-chips">
+        <span style="font-size:10px;color:var(--text3);font-weight:500;min-width:52px;align-self:center">Internal</span>
+        <span class="aud-chip aud-enable"  data-aud="Sales Reps">Sales Reps <span class="aud-dev">⬡</span></span>
+        <span class="aud-chip aud-enable"  data-aud="Internal Teams">Internal <span class="aud-dev">🖥</span></span>
+        <span class="aud-chip aud-enable"  data-aud="Marketing">Marketing <span class="aud-dev">🖥</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="filter-sep"></div>
+  <div class="filter-group">
+    <div class="filter-group-label">Device context</div>
+    <div class="filter-chips">
+      <span class="dev-chip" data-dev="mob">📱 Mobile-first</span>
+      <span class="dev-chip" data-dev="desk">🖥 Desktop</span>
+      <span class="dev-chip" data-dev="both">⬡ Both</span>
+    </div>
+  </div>
+</div>
+
+<div class="sel-summary" id="selSummary"></div>
+<div class="caps-list" id="capsList"></div>
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot s-active"></div>Active today</div>
+  <div class="leg"><div class="leg-dot s-existing"></div>Existing platform</div>
+  <div class="leg"><div class="leg-dot s-emerging"></div>Emerging</div>
+  <div class="leg"><div class="leg-dot s-concept"></div>Concept</div>
+  <div class="leg"><div class="leg-dot s-adopt"></div>To adopt</div>
+  <div class="leg"><div class="leg-dot s-consolidate"></div>Consolidate</div>
+</div>
+
+<script>
+const caps=[
+  {id:'c1',name:'Inspire & Specify',desc:'Demand creation + specification',color:'#1D9E75',icon:'★',bg:'#E1F5EE',device:'both',audiences:['Homeowners','Architects / Designers','Builders'],recBg:'#E1F5EE',recBorder:'#1D9E75',recText:'#085041',tech:[
+    {name:'JH + TT brand websites',desc:'Adobe Experience Manager — brand entry, product discovery, inspiration galleries',status:'active',brand:'cross',device:'both',type:'website',current:true},
+    {name:'Hover Visualizer',desc:'Embedded visualization + measurement on JH.com — homeowners & contractors visualize siding',status:'active',brand:'jh',device:'both',type:'3rd party tool',current:true},
+    {name:'Hardie Insights',desc:'Standalone technical resource library for architects and builders — specs, systems, install guides',status:'active',brand:'jh',device:'desk',type:'website',current:true},
+    {name:'3D Deck Designer',desc:'TimberTech deck design visualization — currently limited to TT products only',status:'emerging',brand:'tt',device:'desk',type:'3rd party tool',current:true},
+    {name:'Whole Home Visualizer',desc:'Cross-brand siding + decking inspiration — built on Hover API + TT product catalog',status:'concept',brand:'cross',device:'mob',type:'app',current:false},
+    {name:'AZEK / TT Spec experience',desc:'A&D technical resource for AZEK + TT — role-personalized, connected to Salesforce',status:'concept',brand:'cross',device:'desk',type:'website',current:false},
+  ],futureRec:'Extend Hover to include TT/AZEK decking products. Build Whole Home Visualizer on top — 3–6 months, not 18. Rebuild Hardie Insights on AEM with SSO + personalization. Connect specification events to Salesforce for lead + project capture.'},
+  {id:'c2',name:'Design, Quote & Sell',desc:'Planning, estimating, selling',color:'#3B6D11',icon:'◈',bg:'#EAF3DE',device:'desk',audiences:['Contractors','Builders','Sales Reps'],recBg:'#EAF3DE',recBorder:'#639922',recText:'#173404',tech:[
+    {name:'3D Deck Designer',desc:'Visual deck design + contractor selling tool — not yet connected to quoting or ordering',status:'emerging',brand:'tt',device:'desk',type:'3rd party tool',current:true},
+    {name:'Railing & Framing Design',desc:'Manual CAD + rendering service via Vietnam partner — real demand, not scalable',status:'active',brand:'tt',device:'desk',type:'manual service',current:true},
+    {name:'Hover (takeoffs)',desc:'Measurement + takeoff capability used by contractors for accurate quoting on JH products',status:'active',brand:'jh',device:'both',type:'3rd party tool',current:true},
+    {name:'Alliance / OnBoard quote tools',desc:'Basic quoting and lead management within existing portals — not unified across brands',status:'existing',brand:'cross',device:'desk',type:'portal feature',current:true},
+    {name:'3D Cloud + railing expansion',desc:'Expand 3D Cloud to include railing + framing — replaces manual service with self-serve tool',status:'concept',brand:'tt',device:'desk',type:'3rd party tool',current:false},
+    {name:'Connected quote-to-order',desc:'3D Cloud design output flows into OnBoard for direct order creation — closes design-to-purchase loop',status:'concept',brand:'cross',device:'desk',type:'integration',current:false},
+  ],futureRec:'Productize Railing & Framing by expanding 3D Cloud. Connect outputs to OnBoard for direct ordering. One design-to-order path, not three disconnected tools.'},
+  {id:'c3',name:'Buy, Order & Fulfill',desc:'Commerce + fulfillment',color:'#854F0B',icon:'▣',bg:'#FAEEDA',device:'desk',audiences:['Contractors','Dealers','Distributors','Retail Partners','Sales Reps'],recBg:'#FAEEDA',recBorder:'#BA7517',recText:'#412402',tech:[
+    {name:'Co-op Store',desc:'WooCommerce — earned co-op fund redemption on approved marketing materials and brand assets',status:'active',brand:'tt',device:'desk',type:'commerce',current:true},
+    {name:'Promo Store',desc:'Branded merchandise + promotional ordering (cash purchase) — platform currently unconfirmed',status:'active',brand:'tt',device:'desk',type:'commerce',current:true},
+    {name:'HardieLink',desc:'JH dealer + distributor portal — SAP integration for product data, pricing, and invoices',status:'existing',brand:'jh',device:'desk',type:'portal',current:true},
+    {name:'Unified commerce layer',desc:'Single platform consolidating Co-op Store + Promo Store — evaluate Salesforce Commerce Cloud',status:'adopt',brand:'cross',device:'both',type:'platform',current:false},
+    {name:'Cross-brand sample ordering',desc:'Homeowners and contractors request samples from JH + TT product lines in one cart',status:'concept',brand:'cross',device:'mob',type:'feature',current:false},
+  ],futureRec:'Identify the Promo Store platform first. Long-term: Salesforce Commerce Cloud. Short-term: get both stores on WooCommerce. Add cross-brand sample ordering as a quick win.'},
+  {id:'c4',name:'Install, Support & Field',desc:'Field execution + crew efficiency',color:'#993C1D',icon:'⬡',bg:'#FAECE7',device:'mob',audiences:['Installers / Crews','Contractors','Sales Reps'],recBg:'#FAECE7',recBorder:'#D85A30',recText:'#4A1B0C',tech:[
+    {name:'Hardie Hotline',desc:'AI-powered multimodal crew support — voice + image input, install troubleshooting, best practices at jobsite',status:'emerging',brand:'jh',device:'mob',type:'AI app',current:true},
+    {name:'Crew Alliance Playbook',desc:'Field guidance content for installers — install sequences, product guidance, troubleshooting',status:'emerging',brand:'jh',device:'both',type:'app',current:true},
+    {name:'OnBoard field access',desc:'TT/AZEK field access to warranties and account data via OnBoard mobile',status:'active',brand:'tt',device:'mob',type:'portal feature',current:true},
+    {name:'Hotline at scale',desc:'Full cross-brand AI crew platform — offline-capable, fine-tuned on JH + TT install data, LMS integration',status:'concept',brand:'cross',device:'mob',type:'AI platform',current:false},
+    {name:'Playbook as Hotline module',desc:'Crew Alliance Playbook content surfaced inside Hotline — one app, not two separate tools',status:'concept',brand:'jh',device:'mob',type:'integration',current:false},
+  ],futureRec:'Hardie Hotline is the highest-ceiling product in the portfolio. Staff it as a product, not an R&D experiment. Get it in front of real crews within 12 months. Fold Playbook into Hotline as a module.'},
+  {id:'c5',name:'Train, Certify & Enable',desc:'Learning + certification',color:'#3C3489',icon:'◉',bg:'#EEEDFE',device:'both',audiences:['Contractors','Installers / Crews','Dealers','Distributors','Builders','Architects / Designers','Retail Partners','Sales Reps','Internal Teams'],recBg:'#EEEDFE',recBorder:'#7F77DD',recText:'#26215C',tech:[
+    {name:'Fragmented training (current)',desc:'Training spread across Alliance, OnBoard, Hardie Insights — no unified LMS or certification record',status:'active',brand:'cross',device:'both',type:'fragmented',current:true},
+    {name:'Crew Alliance certification',desc:'Installer certification program — requirements defined, not yet live',status:'emerging',brand:'jh',device:'both',type:'program',current:true},
+    {name:'Docebo LMS',desc:'AI-powered enterprise LMS — Salesforce native integration, mobile-first, multi-brand, multi-audience',status:'adopt',brand:'cross',device:'both',type:'platform',current:false},
+    {name:'Unified certification record',desc:'One training record across JH + TT/AZEK per user — single completion view in Salesforce',status:'concept',brand:'cross',device:'both',type:'data layer',current:false},
+    {name:'Hotline + LMS integration',desc:'Hotline field task completion auto-triggers LMS certification events — learn by doing',status:'concept',brand:'jh',device:'mob',type:'integration',current:false},
+  ],futureRec:'Adopt Docebo as the single LMS across both brands. Mobile-first for crews, desktop for dealers + internal. Integrate Hotline with the LMS so field task completion earns certifications — that\'s the loop no competitor has.'},
+  {id:'c6',name:'Market, Promote & Grow',desc:'Co-marketing + channel activation',color:'#72243E',icon:'◆',bg:'#FBEAF0',device:'desk',audiences:['Contractors','Dealers','Distributors','Retail Partners','Marketing','Sales Reps'],recBg:'#FBEAF0',recBorder:'#D4537E',recText:'#4B1528',tech:[
+    {name:'MTG Zone (JH)',desc:'JH marketing tech suite — co-marketing assets, co-op fund management, brand materials for channel partners',status:'consolidate',brand:'jh',device:'desk',type:'platform',current:true},
+    {name:'Marketing Tech Suite (TT)',desc:'TT/AZEK marketing platform via OnBoard — same function as MTG Zone, different tool',status:'consolidate',brand:'tt',device:'desk',type:'platform',current:true},
+    {name:'Co-op Store',desc:'WooCommerce co-op redemption — funds spent on approved marketing materials and branded assets',status:'active',brand:'tt',device:'desk',type:'commerce',current:true},
+    {name:'Unified DAM (Bynder)',desc:'Single brand asset platform for JH + TT — replaces MTG Zone + MTS, consolidates all marketing assets',status:'adopt',brand:'cross',device:'desk',type:'platform',current:false},
+    {name:'Cross-brand campaign tools',desc:'Co-branded marketing templates and local activation — one platform, two brand expressions',status:'concept',brand:'cross',device:'desk',type:'feature',current:false},
+    {name:'Consolidated co-op workflow',desc:'Co-op earning, tracking, and redemption in Salesforce-native workflow — no separate WooCommerce session',status:'concept',brand:'cross',device:'both',type:'integration',current:false},
+  ],futureRec:'MTG Zone and TT Marketing Tech Suite are the same product. Pick the better platform, migrate assets, shut down the other within 6 months. Adopt Bynder as the unified DAM.'},
+  {id:'c7',name:'Rewards, Rebates & Program',desc:'Program economics + growth',color:'#633806',icon:'◐',bg:'#FAEEDA',device:'both',audiences:['Contractors','Dealers','Distributors','Retail Partners','Sales Reps'],recBg:'#FAEEDA',recBorder:'#BA7517',recText:'#412402',tech:[
+    {name:'Hardie Alliance (rewards)',desc:'JH contractor rewards and program management — tier benefits, earned value, program access. Desktop only.',status:'existing',brand:'jh',device:'desk',type:'portal',current:true},
+    {name:'OnBoard (rewards hub)',desc:'TT/AZEK program rewards, tier status, and benefit access — most mature rewards experience in the portfolio',status:'active',brand:'tt',device:'both',type:'portal feature',current:true},
+    {name:'HardieLink',desc:'JH dealer + distributor program and pricing portal — tied to SAP data layer',status:'existing',brand:'jh',device:'desk',type:'portal feature',current:true},
+    {name:'Cross-brand rewards view',desc:'Single dashboard showing JH + TT/AZEK program value, tier status, and earnings in the unified portal',status:'concept',brand:'cross',device:'both',type:'portal feature',current:false},
+    {name:'Predictive program insights',desc:'Salesforce-powered earnings trajectory, tier forecasting, and growth recommendations',status:'concept',brand:'cross',device:'both',type:'AI feature',current:false},
+  ],futureRec:'The cross-brand rewards view is the most compelling reason for a contractor to use the unified portal. Build it early — it makes the value of integration immediately tangible.'},
+  {id:'c8',name:'Manage Account & Relationship',desc:'Portal + ongoing relationship',color:'#0C447C',icon:'⬤',bg:'#E6F1FB',device:'both',audiences:['Contractors','Dealers','Distributors','Installers / Crews','Retail Partners','Sales Reps','Internal Teams'],recBg:'#E6F1FB',recBorder:'#378ADD',recText:'#042C53',tech:[
+    {name:'Hardie Alliance',desc:'JH contractor program portal — leads, account mgmt, program access. Salesforce Experience Cloud SF #1. Desktop only.',status:'existing',brand:'jh',device:'desk',type:'portal',current:true},
+    {name:'OnBoard',desc:'TT/AZEK multi-audience portal — most complete in the portfolio. Salesforce mobile app SF #2. Mobile-first + desktop.',status:'active',brand:'tt',device:'both',type:'portal',current:true},
+    {name:'HardieLink',desc:'JH dealer + distributor portal — SAP product data, ordering, invoices. Separate login, separate data layer.',status:'existing',brand:'jh',device:'desk',type:'portal',current:true},
+    {name:'One Front Door portal',desc:'Unified cross-brand program portal — SSO, audience-routed, shared SF backbone. Built on OnBoard architecture.',status:'concept',brand:'cross',device:'both',type:'portal',current:false},
+    {name:'Salesforce Identity / Okta',desc:'Single sign-on — one login across all JH + TT tools, role-based access, brand-appropriate routing',status:'adopt',brand:'cross',device:'both',type:'platform',current:false},
+    {name:'Shared SF data model',desc:'Unified account + contact records — one contractor record, not two. Foundation for cross-brand program value.',status:'adopt',brand:'cross',device:'both',type:'data layer',current:false},
+  ],futureRec:'This IS the One Front Door. OnBoard is the architectural reference — extend it. Alliance + OnBoard + HardieLink converge here with SSO as the first step. One login, one account view, one program dashboard across both brands.'},
+];
+
+const audColors  ={'Homeowners':'#993C1D','Architects / Designers':'#993C1D','Builders':'#993C1D','Contractors':'#0F6E56','Installers / Crews':'#0F6E56','Dealers':'#0F6E56','Distributors':'#0F6E56','Retail Partners':'#0F6E56','Sales Reps':'#3C3489','Internal Teams':'#3C3489','Marketing':'#3C3489'};
+const audBgs     ={'Homeowners':'#FAECE7','Architects / Designers':'#FAECE7','Builders':'#FAECE7','Contractors':'#E1F5EE','Installers / Crews':'#E1F5EE','Dealers':'#E1F5EE','Distributors':'#E1F5EE','Retail Partners':'#E1F5EE','Sales Reps':'#EEEDFE','Internal Teams':'#EEEDFE','Marketing':'#EEEDFE'};
+const audBorders ={'Homeowners':'#F0997B','Architects / Designers':'#F0997B','Builders':'#F0997B','Contractors':'#5DCAA5','Installers / Crews':'#5DCAA5','Dealers':'#5DCAA5','Distributors':'#5DCAA5','Retail Partners':'#5DCAA5','Sales Reps':'#AFA9EC','Internal Teams':'#AFA9EC','Marketing':'#AFA9EC'};
+const devLabel   ={mob:'📱 Mobile-first',desk:'🖥 Desktop',both:'⬡ Both'};
+
+let selAuds=new Set(), selDevs=new Set(), openCaps=new Set();
+
+function toggleAud(a){selAuds.has(a)?selAuds.delete(a):selAuds.add(a);render();}
+function toggleDev(d){selDevs.has(d)?selDevs.delete(d):selDevs.add(d);render();}
+function toggleOpen(id){openCaps.has(id)?openCaps.delete(id):openCaps.add(id);renderList();}
+function resetAll(){selAuds.clear();selDevs.clear();openCaps.clear();render();}
+
+function capMatchesAud(c){return !selAuds.size||c.audiences.some(a=>selAuds.has(a));}
+function capMatchesDev(c){return !selDevs.size||selDevs.has(c.device);}
+
+function techCard(t,future){
+  const dc=({active:'s-active',emerging:'s-emerging',concept:'s-concept',adopt:'s-adopt',consolidate:'s-consolidate',existing:'s-existing'})[t.status]||'s-existing';
+  const bt=t.brand==='jh'?'<span class="tag tag-jh">JH</span>':t.brand==='tt'?'<span class="tag tag-tt">TT/AZEK</span>':'<span class="tag tag-cross">Cross-brand</span>';
+  const dv=t.device==='mob'?'<span class="tag tag-mob">📱</span>':t.device==='desk'?'<span class="tag tag-desk">🖥</span>':'<span class="tag tag-both">⬡</span>';
+  return `<div class="${future?'future-tech-card':'tech-card'}"><div class="tc-top"><div class="tc-dot ${dc}"></div><div class="tc-name">${t.name}</div></div><div class="tc-desc">${t.desc}</div><div class="tc-tags">${bt}${dv}<span class="tag tag-type">${t.type}</span></div></div>`;
+}
+
+function renderList(){
+  const anyFilter=selAuds.size>0||selDevs.size>0;
+  document.getElementById('capsList').innerHTML=caps.map(c=>{
+    const matches=capMatchesAud(c)&&capMatchesDev(c);
+    const isOpen=openCaps.has(c.id);
+    const showAuds=selAuds.size?c.audiences.filter(a=>selAuds.has(a)):c.audiences;
+    const pills=showAuds.slice(0,6).map(a=>`<span style="background:${audBgs[a]};color:${audColors[a]};border:.5px solid ${audBorders[a]};font-size:9px;padding:1px 6px;border-radius:999px">${a}</span>`).join('')+(showAuds.length>6?`<span style="font-size:9px;color:var(--text3)">+${showAuds.length-6}</span>`:'');
+    const dvTag=c.device==='mob'?'<span class="tag tag-mob" style="font-size:9px">📱 Mobile</span>':c.device==='desk'?'<span class="tag tag-desk" style="font-size:9px">🖥 Desktop</span>':'<span class="tag tag-both" style="font-size:9px">⬡ Both</span>';
+    const cur=c.tech.filter(t=>t.current),fut=c.tech.filter(t=>!t.current);
+    return `<div class="cap-section${isOpen?' active':''}${anyFilter&&!matches?' dimmed':''}" style="${isOpen?'--cap-color:'+c.color:''}">
+      <div class="cap-section-header" onclick="toggleOpen('${c.id}')">
+        <div class="cap-icon-wrap" style="background:${c.bg}">${c.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div class="cap-header-name">${c.name}</div>
+          <div class="cap-header-desc">${c.desc}</div>
+          <div class="cap-header-auds">${pills}</div>
+        </div>
+        <div class="cap-header-meta">
+          ${dvTag}
+          <div class="cap-meta-counts"><span>${cur.length}</span> today · <span>${fut.length}</span> future</div>
+        </div>
+        <div class="cap-chevron${isOpen?' open':''}">▾</div>
+      </div>
+      ${isOpen?`<div class="cap-body open">
+        <div class="body-section-label">Today — ${cur.length} tool${cur.length!==1?'s':''}</div>
+        <div class="tech-grid">${cur.map(t=>techCard(t,false)).join('')}</div>
+        ${fut.length?`<div class="future-block" style="border-color:${c.color}">
+          <div class="future-block-header" style="background:${c.bg}">
+            <span class="future-block-title" style="color:${c.recText}">Future vision</span>
+            <span class="future-block-badge" style="background:${c.color}">${fut.length} addition${fut.length!==1?'s':''}</span>
+          </div>
+          <div class="future-tech-grid">${fut.map(t=>techCard(t,true)).join('')}</div>
+          <div class="future-rec" style="background:${c.recBg};border-color:${c.recBorder};color:${c.recText}"><strong>Strategic recommendation</strong>${c.futureRec}</div>
+        </div>`:''}
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function render(){
+  document.querySelectorAll('.aud-chip').forEach(c=>c.classList.toggle('on',selAuds.has(c.dataset.aud)));
+  document.querySelectorAll('.dev-chip').forEach(c=>c.classList.toggle('on',selDevs.has(c.dataset.dev)));
+  const s=document.getElementById('selSummary');
+  const parts=[];
+  if(selAuds.size){const pills=[...selAuds].map(a=>`<span style="background:${audBgs[a]};color:${audColors[a]};border:.5px solid ${audBorders[a]};font-size:10px;padding:2px 7px;border-radius:999px">${a}</span>`).join('');const n=caps.filter(c=>capMatchesAud(c)&&capMatchesDev(c)).length;parts.push(`<span style="font-weight:500;color:var(--text)">${n}</span> capabilities for ${pills}`);}
+  if(selDevs.size){const dl=[...selDevs].map(d=>`<span style="font-size:10px;padding:2px 7px;border-radius:999px;background:var(--bg2);border:.5px solid var(--border2);color:var(--text2)">${devLabel[d]}</span>`).join('');parts.push(`device: ${dl}`);}
+  s.innerHTML=parts.length?parts.join(' &nbsp;·&nbsp; ')+' <span style="color:var(--text3)">— click any row to expand</span>':'<span style="color:var(--text3)">No filters active — click any capability row to expand it</span>';
+  renderList();
+}
+
+document.querySelectorAll('.aud-chip').forEach(c=>{c.onclick=()=>toggleAud(c.dataset.aud);});
+document.querySelectorAll('.dev-chip').forEach(c=>{c.onclick=()=>toggleDev(c.dataset.dev);});
+render();
+</script>
+</body>
+</html>
