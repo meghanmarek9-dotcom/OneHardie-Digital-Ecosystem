@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Pro Portal — James Hardie + TimberTech/AZEK</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --jh-green: #1f5c34;
+  --jh-green2: #2d7a4f;
+  --jh-green3: #3a9463;
+  --jh-light: #edf7f1;
+  --jh-mid: #c6e6d2;
+  --tt-red: #c0392b;
+  --tt-red2: #e74c3c;
+  --tt-light: #fdecea;
+  --slate: #1e2d3d;
+  --slate2: #2c3e50;
+  --text: #111827;
+  --text2: #374151;
+  --text3: #6b7280;
+  --text4: #9ca3af;
+  --bg: #f7f9f8;
+  --bg2: #ffffff;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.13);
+  --sidebar-w: 224px;
+  --topbar-h: 54px;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #dfe6df; min-height: 100vh; }
+
+/* ── DEMO ORCHESTRATION BAR ── */
+.demo-bar {
+  background: var(--slate);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-bottom: 2px solid var(--jh-green);
+  flex-wrap: wrap;
+}
+.demo-section { display: flex; align-items: center; gap: 8px; padding: 10px 16px 10px 0; border-right: 1px solid rgba(255,255,255,0.1); margin-right: 16px; }
+.demo-section:last-child { border-right: none; margin-left: auto; }
+.demo-section-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.4); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.demo-tabs { display: flex; gap: 3px; }
+.demo-tab {
+  font-size: 11px; font-weight: 500; padding: 5px 12px; border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.15); background: transparent;
+  color: rgba(255,255,255,0.55); cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.demo-tab:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.demo-tab.on { background: var(--jh-green); color: #fff; border-color: var(--jh-green3); }
+.view-btns { display: flex; gap: 3px; }
+.view-btn { font-size: 11px; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: rgba(255,255,255,0.55); cursor: pointer; transition: all .15s; }
+.view-btn:hover { color: #fff; }
+.view-btn.on { background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.3); }
+
+/* ── CAPABILITY STRIP (shows shared layer) ── */
+.cap-strip {
+  background: var(--jh-green);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+}
+.cap-strip-label { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,0.45); white-space: nowrap; margin-right: 12px; flex-shrink: 0; }
+.cap-pill {
+  font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.65);
+  padding: 7px 12px; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.12);
+  transition: all .12s; cursor: default; flex-shrink: 0;
+}
+.cap-pill:last-child { border-right: none; }
+.cap-pill.active { color: #fff; background: rgba(255,255,255,0.12); }
+.cap-pill-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #4ade80; margin-right: 5px; vertical-align: middle; }
+
+/* ── DEVICE FRAMES ── */
+.device-wrap { padding: 14px 20px 20px; display: flex; justify-content: center; }
+.device-desktop { width: 100%; max-width: 1120px; background: #2c3e50; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.35); }
+.chrome-bar { background: #3d4f62; padding: 8px 14px; display: flex; align-items: center; gap: 10px; }
+.chrome-dots { display: flex; gap: 5px; }
+.chrome-dot { width: 10px; height: 10px; border-radius: 50%; }
+.chrome-url { flex: 1; background: #2c3e50; border-radius: 5px; padding: 5px 12px; font-size: 11px; color: #9ca3af; font-family: monospace; }
+.chrome-lock { font-size: 10px; color: #4ade80; margin-right: 4px; }
+
+.device-mobile { width: 375px; background: #2c3e50; border-radius: 36px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4); border: 7px solid #3d4f62; }
+.mobile-notch { background: #1a2535; height: 30px; display: flex; align-items: center; justify-content: center; }
+.mobile-pill { width: 72px; height: 7px; background: #2c3e50; border-radius: 999px; }
+
+/* ── PORTAL SHELL ── */
+.portal { display: flex; height: 580px; background: var(--bg); overflow: hidden; }
+.portal-mobile { height: 660px; flex-direction: column; }
+
+/* SIDEBAR */
+.sidebar { width: var(--sidebar-w); background: #fff; border-right: 1px solid var(--border2); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
+.sidebar-logo { padding: 14px 16px 12px; border-bottom: 1px solid var(--border2); display: flex; align-items: center; gap: 9px; }
+.logo-icon { width: 30px; height: 30px; background: var(--jh-green); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; flex-shrink: 0; }
+.logo-name { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.1; }
+.logo-sub  { font-size: 9px; color: var(--text4); font-weight: 400; }
+.brand-badges { padding: 8px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 5px; }
+.brand-badge { font-size: 9px; font-weight: 600; padding: 3px 8px; border-radius: 4px; letter-spacing: .02em; }
+.bb-jh { background: var(--jh-light); color: var(--jh-green); border: 1px solid var(--jh-mid); }
+.bb-tt { background: var(--tt-light); color: var(--tt-red); border: 1px solid #f5c6c2; }
+.sidebar-user { padding: 10px 16px 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+.user-av { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.user-name { font-size: 12px; font-weight: 600; color: var(--text); }
+.user-role { font-size: 10px; color: var(--text3); }
+.sidebar-nav { flex: 1; padding: 8px 0; }
+.nav-group-label { font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text4); padding: 10px 16px 3px; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 7px 16px; font-size: 12px; color: var(--text2); cursor: pointer; transition: all .12s; border-left: 2px solid transparent; }
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active { background: var(--jh-light); color: var(--jh-green); border-left-color: var(--jh-green); font-weight: 500; }
+.nav-icon { width: 16px; text-align: center; font-size: 13px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 999px; }
+.nb-red   { background: #fee2e2; color: #dc2626; }
+.nb-green { background: var(--jh-light); color: var(--jh-green); }
+.nb-gray  { background: #f3f4f6; color: var(--text3); }
+
+/* MAIN AREA */
+.main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.topbar { height: var(--topbar-h); background: #fff; border-bottom: 1px solid var(--border2); display: flex; align-items: center; padding: 0 20px; gap: 12px; flex-shrink: 0; }
+.topbar-title { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
+.topbar-greeting { font-size: 12px; color: var(--text3); }
+.topbar-right { display: flex; gap: 8px; align-items: center; }
+.topbar-icon-btn { width: 32px; height: 32px; border-radius: var(--radius); background: var(--bg); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; position: relative; }
+.notif-dot { position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; border: 1.5px solid #fff; }
+.content-area { flex: 1; overflow-y: auto; padding: 16px 20px; }
+
+/* ── WELCOME BANNER ── */
+.welcome-banner { background: linear-gradient(135deg, var(--jh-green) 0%, var(--jh-green2) 60%, #1b4332 100%); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; }
+.wb-text { flex: 1; }
+.wb-greeting { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .06em; }
+.wb-name    { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+.wb-sub     { font-size: 12px; color: rgba(255,255,255,0.65); }
+.wb-brands  { display: flex; gap: 6px; margin-top: 8px; }
+.wb-brand-tag { font-size: 9px; font-weight: 600; padding: 3px 9px; border-radius: 4px; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.2); }
+.wb-tier { text-align: center; background: rgba(255,255,255,0.1); border-radius: var(--radius); padding: 10px 16px; border: 1px solid rgba(255,255,255,0.15); flex-shrink: 0; }
+.wb-tier-label { font-size: 9px; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+.wb-tier-name  { font-size: 14px; font-weight: 800; color: #4ade80; }
+.wb-tier-sub   { font-size: 10px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+
+/* ── STAT CARDS ── */
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; }
+.stat-card { background: #fff; border: 1px solid var(--border2); border-radius: var(--radius); padding: 12px 14px; }
+.stat-label { font-size: 10px; color: var(--text3); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+.stat-value { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 3px; }
+.stat-sub { font-size: 10px; color: var(--text4); }
+.stat-change { font-size: 10px; font-weight: 600; }
+.up   { color: var(--jh-green2); }
+.down { color: #dc2626; }
+.stat-bar { height: 3px; border-radius: 999px; margin-top: 8px; }
+
+/* ── LEAD CARDS ── */
+.lead-card { background: #fff; border: 1px solid var(--border2); border-radius: var(--radius); padding: 11px 13px; margin-bottom: 7px; cursor: pointer; transition: all .12s; }
+.lead-card:hover { border-color: var(--jh-green3); box-shadow: 0 2px 8px rgba(31,92,52,0.1); }
+.lead-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+.lead-av { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.lead-info { flex: 1; min-width: 0; }
+.lead-name-row { display: flex; align-items: center; gap: 7px; margin-bottom: 2px; }
+.lead-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.lead-temp { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.temp-hot  { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+.temp-warm { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+.temp-new  { background: var(--jh-light); color: var(--jh-green); border: 1px solid var(--jh-mid); }
+.lead-addr { font-size: 11px; color: var(--text3); }
+.lead-desc { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+.lead-footer { display: flex; align-items: center; gap: 8px; }
+.lead-source { font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+.src-hover { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.src-web   { background: #f3f4f6; color: var(--text3); border: 1px solid var(--border2); }
+.src-ref   { background: var(--jh-light); color: var(--jh-green); border: 1px solid var(--jh-mid); }
+.lead-value { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--jh-green); }
+.lead-cta { font-size: 10px; font-weight: 600; color: var(--jh-green); margin-left: 8px; cursor: pointer; }
+
+/* ── CAPABILITY HUB WIDGET ── */
+.cap-hub { background: #fff; border: 1px solid var(--border2); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 14px; }
+.cap-hub-header { background: var(--jh-green); padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+.cap-hub-title { font-size: 11px; font-weight: 700; color: #fff; }
+.cap-hub-sub   { font-size: 10px; color: rgba(255,255,255,0.6); }
+.cap-hub-badge { margin-left: auto; font-size: 9px; background: rgba(255,255,255,0.2); color: #fff; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+.cap-hub-grid  { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; }
+.cap-hub-item  { padding: 11px 12px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s; }
+.cap-hub-item:hover { background: var(--jh-light); }
+.cap-hub-item:nth-child(4n) { border-right: none; }
+.cap-hub-item:nth-child(n+5) { border-bottom: none; }
+.cap-hub-icon { font-size: 16px; margin-bottom: 5px; }
+.cap-hub-name { font-size: 10px; font-weight: 600; color: var(--text); margin-bottom: 2px; line-height: 1.3; }
+.cap-hub-avail { font-size: 9px; color: var(--text4); }
+.cap-hub-dot-on  { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #4ade80; margin-right: 3px; }
+.cap-hub-dot-off { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #d1d5db; margin-right: 3px; }
+
+/* ── MY TOOLS ── */
+.tools-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 8px; margin-bottom: 14px; }
+.tool-item { background: #fff; border: 1px solid var(--border2); border-radius: var(--radius); padding: 13px 8px; text-align: center; cursor: pointer; transition: all .15s; }
+.tool-item:hover { border-color: var(--jh-green3); background: var(--jh-light); box-shadow: 0 2px 8px rgba(31,92,52,0.08); }
+.tool-emoji { font-size: 22px; margin-bottom: 6px; }
+.tool-name  { font-size: 10px; font-weight: 600; color: var(--text); line-height: 1.3; margin-bottom: 2px; }
+.tool-brand { font-size: 9px; color: var(--text4); }
+
+/* ── PROGRAM + REWARDS ── */
+.rewards-card { background: #fff; border: 1px solid var(--border2); border-radius: var(--radius); padding: 14px; }
+.rc-value { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 4px; }
+.rc-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px; }
+.rc-split { display: flex; gap: 6px; margin-bottom: 10px; }
+.rc-brand-pill { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+.rcp-jh { background: var(--jh-light); color: var(--jh-green); border: 1px solid var(--jh-mid); }
+.rcp-tt { background: var(--tt-light); color: var(--tt-red); border: 1px solid #f5c6c2; }
+.rc-spend-label { font-size: 9px; color: var(--text4); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 5px; }
+.rc-spend-tags  { display: flex; gap: 4px; flex-wrap: wrap; }
+.rc-spend-tag   { font-size: 9px; padding: 2px 7px; border-radius: 4px; background: #f3f4f6; color: var(--text3); border: 1px solid var(--border2); }
+
+/* ── INSTALLER: PROJECT PHOTOS ── */
+.project-photo { border-radius: var(--radius); overflow: hidden; aspect-ratio: 4/3; position: relative; margin-bottom: 6px; }
+.photo-placeholder { width: 100%; height: 100%; display: flex; align-items: flex-end; }
+.photo-overlay { background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 50%); padding: 10px; width: 100%; }
+.photo-caption { font-size: 10px; color: #fff; font-weight: 500; line-height: 1.3; }
+.photo-date { font-size: 9px; color: rgba(255,255,255,0.6); }
+.hotline-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(74,222,128,0.2); border: 1px solid rgba(74,222,128,0.4); border-radius: 999px; padding: 2px 8px; margin-top: 4px; }
+.hotline-chip-text { font-size: 9px; color: #4ade80; font-weight: 600; }
+
+/* ── HARDIE HOTLINE CHAT ── */
+.hotline-panel { background: #fff; border: 1px solid var(--border2); border-radius: var(--radius-lg); overflow: hidden; }
+.hotline-header { background: var(--jh-green); padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+.hotline-icon { width: 28px; height: 28px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.hotline-title { font-size: 12px; font-weight: 700; color: #fff; }
+.hotline-status { font-size: 9px; color: rgba(255,255,255,0.6); }
+.hotline-status-dot { display: inline-block; width: 6px; height: 6px; background: #4ade80; border-radius: 50%; margin-right: 4px; }
+.hotline-body { padding: 12px; }
+.hotline-msg { margin-bottom: 8px; display: flex; gap: 7px; }
+.hm-user { justify-content: flex-end; }
+.hm-bubble { max-width: 85%; font-size: 11px; line-height: 1.5; border-radius: 10px; padding: 8px 11px; }
+.hm-q  { background: #f3f4f6; color: var(--text2); border-radius: 10px 10px 2px 10px; }
+.hm-a  { background: var(--jh-light); color: var(--jh-green); border-radius: 10px 10px 10px 2px; border: 1px solid var(--jh-mid); }
+.hm-ai-av { width: 22px; height: 22px; background: var(--jh-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+.hotline-input { margin-top: 8px; display: flex; gap: 6px; align-items: center; background: #f9fafb; border: 1px solid var(--border2); border-radius: 8px; padding: 7px 10px; }
+.hi-text { font-size: 11px; color: var(--text4); flex: 1; }
+.hi-actions { display: flex; gap: 6px; }
+.hi-btn { font-size: 11px; color: var(--text4); cursor: pointer; }
+
+/* ── TOOLBELT MARKETPLACE ── */
+.toolbelt-panel { background: #fff; border: 1px solid var(--border2); border-radius: var(--radius-lg); overflow: hidden; }
+.toolbelt-header { background: var(--slate2); padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+.toolbelt-title { font-size: 12px; font-weight: 700; color: #fff; }
+.toolbelt-sub { font-size: 10px; color: rgba(255,255,255,0.5); }
+.tb-match { background: #fff; border: 1px solid var(--border2); border-radius: var(--radius); padding: 10px 12px; margin: 0 12px 8px; }
+.tb-match:first-of-type { margin-top: 10px; }
+.tb-match-top { display: flex; align-items: center; gap: 9px; margin-bottom: 5px; }
+.tb-av { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.tb-name { font-size: 12px; font-weight: 600; color: var(--text); }
+.tb-cert { font-size: 9px; color: var(--jh-green); font-weight: 600; background: var(--jh-light); padding: 1px 6px; border-radius: 3px; }
+.tb-detail { font-size: 10px; color: var(--text3); margin-bottom: 5px; }
+.tb-footer { display: flex; gap: 6px; align-items: center; }
+.tb-tag { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #f3f4f6; color: var(--text3); }
+.tb-cta { margin-left: auto; font-size: 10px; font-weight: 600; color: var(--jh-green); background: var(--jh-light); padding: 3px 10px; border-radius: 5px; border: 1px solid var(--jh-mid); cursor: pointer; }
+
+/* ── CO-OP / DEALER ── */
+.coop-card { background: #fff; border: 1px solid var(--border2); border-radius: var(--radius); padding: 14px; }
+.coop-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.coop-brand-block { border-radius: var(--radius); padding: 10px; }
+.coop-bb-jh { background: var(--jh-light); border: 1px solid var(--jh-mid); }
+.coop-bb-tt { background: var(--tt-light); border: 1px solid #f5c6c2; }
+.coop-brand-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+.coop-bb-jh .coop-brand-label { color: var(--jh-green); }
+.coop-bb-tt .coop-brand-label { color: var(--tt-red); }
+.coop-amount { font-size: 20px; font-weight: 800; }
+.coop-bb-jh .coop-amount { color: var(--jh-green); }
+.coop-bb-tt .coop-amount { color: var(--tt-red); }
+.coop-avail { font-size: 9px; color: var(--text3); }
+.prog-bar-bg { background: #f3f4f6; border-radius: 999px; height: 6px; }
+.prog-bar-fill { height: 6px; border-radius: 999px; background: var(--jh-green); }
+.prog-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text4); margin-top: 4px; }
+
+/* ── ORDER ITEMS ── */
+.order-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.order-row:last-child { border-bottom: none; }
+.order-id { font-size: 10px; font-weight: 700; color: var(--jh-green); min-width: 62px; }
+.order-desc { font-size: 11px; color: var(--text2); flex: 1; }
+.order-brand-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.order-amt { font-size: 11px; font-weight: 700; color: var(--text); }
+.order-status { font-size: 9px; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+.os-transit   { background: #dbeafe; color: #1d4ed8; }
+.os-delivered { background: var(--jh-light); color: var(--jh-green); }
+.os-pending   { background: #fff7ed; color: #c2410c; }
+
+/* ── CERT ITEMS ── */
+.cert-row { display: flex; align-items: center; gap: 9px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.cert-row:last-child { border-bottom: none; }
+.cert-icon { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.cert-name { font-size: 11px; font-weight: 500; color: var(--text); flex: 1; }
+.cert-brand { font-size: 9px; color: var(--text4); }
+.cert-status { font-size: 9px; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+.cs-done    { background: var(--jh-light); color: var(--jh-green); }
+.cs-prog    { background: #fff7ed; color: #c2410c; }
+.cs-locked  { background: #f3f4f6; color: var(--text4); }
+
+/* ── NOTIFICATIONS ── */
+.notif-item { display: flex; gap: 9px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.notif-item:last-child { border-bottom: none; }
+.nd { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.notif-text { font-size: 11px; color: var(--text2); line-height: 1.5; flex: 1; }
+.notif-time { font-size: 10px; color: var(--text4); white-space: nowrap; }
+
+/* ── QUICK ACTIONS ── */
+.qa-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.qa-btn { flex: 1; background: #fff; border: 1px solid var(--border2); border-radius: var(--radius); padding: 10px 6px; text-align: center; cursor: pointer; transition: all .12s; }
+.qa-btn:hover { border-color: var(--jh-green3); background: var(--jh-light); }
+.qa-icon  { font-size: 16px; margin-bottom: 4px; }
+.qa-label { font-size: 10px; font-weight: 500; color: var(--text); }
+
+/* ── SECTION HEADER ── */
+.sec-hdr { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+.sec-link { font-size: 10px; font-weight: 500; color: var(--jh-green2); cursor: pointer; }
+.divider { height: .5px; background: var(--border); margin: 12px 0; }
+
+/* ── GRID HELPERS ── */
+.two-col    { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 14px; }
+.two-col-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.three-col  { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+.card { background: #fff; border: 1px solid var(--border2); border-radius: var(--radius); }
+.card-inner { padding: 12px 14px; }
+
+/* ── MOBILE ── */
+.mobile-header { background: var(--jh-green); padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+.mh-logo-icon { width: 24px; height: 24px; background: rgba(255,255,255,0.2); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #fff; }
+.mh-title { font-size: 13px; font-weight: 700; color: #fff; flex: 1; }
+.mobile-content { flex: 1; overflow-y: auto; background: var(--bg); padding: 14px; }
+.mobile-bottom-nav { background: #fff; border-top: 1px solid var(--border2); display: flex; justify-content: space-around; padding: 8px 0 4px; }
+.mbn-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 3px 12px; cursor: pointer; }
+.mbn-icon  { font-size: 18px; }
+.mbn-label { font-size: 9px; color: var(--text4); }
+.mbn-item.active .mbn-label { color: var(--jh-green); font-weight: 700; }
+
+/* ── PROJECT PHOTO PREVIEWS (CSS-based) ── */
+.proj-photos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.proj-photo-card { border-radius: var(--radius); overflow: hidden; position: relative; cursor: pointer; }
+.proj-photo-card:hover .ppc-overlay { opacity: 1; }
+.ppc-bg { height: 90px; position: relative; }
+.ppc-siding { background: linear-gradient(135deg, #8b6f47 0%, #a0845c 30%, #c4a882 60%, #8b6f47 100%); }
+.ppc-deck   { background: linear-gradient(135deg, #5d4037 0%, #795548 40%, #a1887f 70%, #6d4c41 100%); }
+.ppc-trim   { background: linear-gradient(135deg, #eceff1 0%, #cfd8dc 50%, #b0bec5 100%); }
+.ppc-install{ background: linear-gradient(135deg, #37474f 0%, #546e7a 40%, #78909c 100%); }
+.ppc-lines { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(0,0,0,0.04) 8px, rgba(0,0,0,0.04) 9px); }
+.ppc-overlay { position: absolute; inset: 0; background: rgba(31,92,52,0.85); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s; }
+.ppc-overlay-text { font-size: 10px; color: #fff; font-weight: 600; text-align: center; padding: 8px; }
+.ppc-footer { background: #fff; padding: 7px 9px; border: 1px solid var(--border2); border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
+.ppc-addr   { font-size: 10px; font-weight: 600; color: var(--text); }
+.ppc-meta   { font-size: 9px; color: var(--text4); margin-top: 1px; }
+.ppc-ai-tag { display: inline-flex; align-items: center; gap: 3px; background: var(--jh-light); border: 1px solid var(--jh-mid); border-radius: 3px; padding: 1px 5px; margin-top: 3px; }
+.ppc-ai-tag-text { font-size: 9px; color: var(--jh-green); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ORCHESTRATION BAR -->
+<div class="demo-bar">
+  <div class="demo-section">
+    <span class="demo-section-label">Viewing as</span>
+    <div class="demo-tabs">
+      <button class="demo-tab on"  onclick="switchAud('contractor',this)">Contractor</button>
+      <button class="demo-tab"     onclick="switchAud('installer',this)">Installer / Crew</button>
+      <button class="demo-tab"     onclick="switchAud('dealer',this)">Dealer</button>
+      <button class="demo-tab"     onclick="switchAud('distributor',this)">Distributor</button>
+      <button class="demo-tab"     onclick="switchAud('retail',this)">Retail Partner</button>
+    </div>
+  </div>
+  <div class="demo-section" style="margin-left:auto;border-right:none">
+    <span class="demo-section-label">Device</span>
+    <div class="view-btns">
+      <button class="view-btn on" onclick="switchView('desktop',this)">🖥 Desktop</button>
+      <button class="view-btn"    onclick="switchView('mobile',this)">📱 Mobile</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHARED CAPABILITY STRIP -->
+<div class="cap-strip" id="capStrip">
+  <span class="cap-strip-label">Shared capabilities</span>
+</div>
+
+<!-- DESKTOP FRAME -->
+<div class="device-wrap" id="desktopWrap">
+  <div class="device-desktop">
+    <div class="chrome-bar">
+      <div class="chrome-dots">
+        <div class="chrome-dot" style="background:#ef4444"></div>
+        <div class="chrome-dot" style="background:#f59e0b"></div>
+        <div class="chrome-dot" style="background:#22c55e"></div>
+      </div>
+      <div class="chrome-url"><span class="chrome-lock">🔒</span>pro.jameshardie.com/portal</div>
+    </div>
+    <div class="portal" id="portalShell">
+      <div class="sidebar" id="sidebar"></div>
+      <div class="main-area">
+        <div class="topbar" id="topbar"></div>
+        <div class="content-area" id="mainContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE FRAME -->
+<div class="device-wrap" id="mobileWrap" style="display:none">
+  <div class="device-mobile">
+    <div class="mobile-notch"><div class="mobile-pill"></div></div>
+    <div class="portal portal-mobile" id="mobilePortal"></div>
+  </div>
+</div>
+
+<script>
+const audiences = {
+  contractor: {
+    name:'Marcus Rivera', initials:'MR', role:'Pro Contractor · Alliance Gold',
+    avatarBg:'#2d6a4f', brands:['James Hardie','TimberTech/AZEK'],
+    tier:'Alliance Gold', tierPct:72, tierTo:'Platinum',
+    activeCap:'Leads & Sales',
+    nav:[
+      {group:'Overview', items:[
+        {icon:'🏠',label:'Dashboard',active:true},
+        {icon:'📋',label:'My leads',badge:'4',bc:'nb-red'},
+        {icon:'⭐',label:'Program & rewards'},
+      ]},
+      {group:'Tools', items:[
+        {icon:'🏗️',label:'Design tools'},
+        {icon:'📦',label:'Order samples'},
+        {icon:'🛍️',label:'Promo store'},
+        {icon:'📣',label:'Marketing hub'},
+      ]},
+      {group:'Resources', items:[
+        {icon:'🎓',label:'Training & certs',badge:'1',bc:'nb-green'},
+        {icon:'📜',label:'Warranties'},
+        {icon:'💬',label:'Hardie Hotline'},
+      ]},
+    ],
+  },
+  installer: {
+    name:'Carlos Mendez', initials:'CM', role:'Elite Certified Installer',
+    avatarBg:'#386641', brands:['James Hardie'],
+    tier:'Elite Installer', tierPct:88, tierTo:'Master',
+    activeCap:'Field & Install',
+    nav:[
+      {group:'Today', items:[
+        {icon:'🔨',label:'Active jobs',active:true,badge:'2',bc:'nb-red'},
+        {icon:'📞',label:'Hardie Hotline'},
+        {icon:'📖',label:'Install Playbook'},
+      ]},
+      {group:'Career', items:[
+        {icon:'🏅',label:'Certifications',badge:'1',bc:'nb-green'},
+        {icon:'🧰',label:'Toolbelt Marketplace'},
+        {icon:'💰',label:'My earnings'},
+      ]},
+      {group:'Support', items:[
+        {icon:'📄',label:'Spec library'},
+        {icon:'📷',label:'Project photos'},
+      ]},
+    ],
+  },
+  dealer: {
+    name:'Sarah Chen', initials:'SC', role:'Showroom Manager · Summit Building Supply',
+    avatarBg:'#1b4332', brands:['James Hardie','TimberTech/AZEK'],
+    tier:'Premier Dealer', tierPct:60, tierTo:'Elite Dealer',
+    activeCap:'Co-op & Marketing',
+    nav:[
+      {group:'Overview', items:[
+        {icon:'🏠',label:'Dashboard',active:true},
+        {icon:'📦',label:'Place order',badge:'1',bc:'nb-red'},
+        {icon:'💵',label:'Co-op funds'},
+      ]},
+      {group:'Showroom', items:[
+        {icon:'📣',label:'Marketing assets'},
+        {icon:'🖼️',label:'Merchandising'},
+        {icon:'◎',label:'Sample ordering'},
+      ]},
+      {group:'Business', items:[
+        {icon:'🎓',label:'Team training'},
+        {icon:'📄',label:'Invoices & orders'},
+        {icon:'👤',label:'Account manager'},
+      ]},
+    ],
+  },
+  distributor: {
+    name:'Tom Patel', initials:'TP', role:'Territory Manager · Western Distribution',
+    avatarBg:'#245234', brands:['James Hardie','TimberTech/AZEK'],
+    tier:'Strategic Partner', tierPct:84, tierTo:'National',
+    activeCap:'Analytics & Channel',
+    nav:[
+      {group:'Overview', items:[
+        {icon:'🏠',label:'Dashboard',active:true},
+        {icon:'👥',label:'Channel accounts',badge:'12',bc:'nb-green'},
+        {icon:'📊',label:'Program analytics'},
+      ]},
+      {group:'Commerce', items:[
+        {icon:'📦',label:'Order management'},
+        {icon:'💵',label:'Co-op management'},
+        {icon:'⭐',label:'Rebates & pricing'},
+      ]},
+      {group:'Enablement', items:[
+        {icon:'🎓',label:'Dealer enablement'},
+        {icon:'📣',label:'Marketing fund mgmt'},
+      ]},
+    ],
+  },
+  retail: {
+    name:'Jennifer Brooks', initials:'JB', role:'Category Manager · National Home Center Pro',
+    avatarBg:'#52b788', brands:['James Hardie','TimberTech/AZEK'],
+    tier:'Retail Partner', tierPct:45, tierTo:'Preferred Retail',
+    activeCap:'Training & Merch',
+    nav:[
+      {group:'Overview', items:[
+        {icon:'🏠',label:'Dashboard',active:true},
+        {icon:'📦',label:'Product catalog'},
+        {icon:'🖼️',label:'Merchandising'},
+      ]},
+      {group:'Education', items:[
+        {icon:'🎓',label:'Staff training',badge:'3',bc:'nb-green'},
+        {icon:'📣',label:'Marketing assets'},
+        {icon:'📺',label:'Display support'},
+      ]},
+      {group:'Reporting', items:[
+        {icon:'📊',label:'Sell-through reports'},
+        {icon:'🤝',label:'Partner resources'},
+      ]},
+    ],
+  },
+};
+
+const allCaps = [
+  {icon:'🌟', name:'Inspire & Specify'},
+  {icon:'📐', name:'Design, Quote & Sell'},
+  {icon:'🛒', name:'Buy, Order & Fulfill'},
+  {icon:'🔧', name:'Install & Field'},
+  {icon:'🎓', name:'Train & Certify'},
+  {icon:'📣', name:'Market & Promote'},
+  {icon:'💰', name:'Rewards & Program'},
+  {icon:'👤', name:'Account & Portal'},
+];
+
+const audActiveCaps = {
+  contractor: [0,1,4,5,6,7],
+  installer:  [3,4,7],
+  dealer:     [2,4,5,6,7],
+  distributor:[2,4,5,6,7],
+  retail:     [4,5,7],
+};
+
+let aud = 'contractor', view = 'desktop';
+
+function buildCapStrip() {
+  const active = audActiveCaps[aud];
+  const html = allCaps.map((c,i) => `<div class="cap-pill${active.includes(i)?' active':''}">
+    ${active.includes(i)?'<span class="cap-pill-dot"></span>':''}${c.icon} ${c.name}
+  </div>`).join('');
+  document.getElementById('capStrip').innerHTML = '<span class="cap-strip-label">Shared capabilities</span>' + html;
+}
+
+function buildSidebar() {
+  const a = audiences[aud];
+  let html = `
+    <div class="sidebar-logo">
+      <div class="logo-icon">JH</div>
+      <div><div class="logo-name">One Pro Portal</div><div class="logo-sub">James Hardie + TimberTech</div></div>
+    </div>
+    <div class="brand-badges">
+      ${a.brands.includes('James Hardie')?'<span class="brand-badge bb-jh">James Hardie</span>':''}
+      ${a.brands.includes('TimberTech/AZEK')?'<span class="brand-badge bb-tt">TimberTech/AZEK</span>':''}
+    </div>
+    <div class="sidebar-user">
+      <div class="user-av" style="background:${a.avatarBg}">${a.initials}</div>
+      <div><div class="user-name">${a.name}</div><div class="user-role">${a.role}</div></div>
+    </div>
+    <nav class="sidebar-nav">`;
+  a.nav.forEach(g => {
+    html += `<div class="nav-group-label">${g.group}</div>`;
+    g.items.forEach(item => {
+      html += `<div class="nav-item${item.active?' active':''}">
+        <span class="nav-icon">${item.icon}</span>${item.label}
+        ${item.badge?`<span class="nav-badge ${item.bc}">${item.badge}</span>`:''}
+      </div>`;
+    });
+  });
+  html += '</nav>';
+  document.getElementById('sidebar').innerHTML = html;
+}
+
+function buildTopbar() {
+  const a = audiences[aud];
+  const greetings = {
+    contractor:`Good morning, ${a.name.split(' ')[0]} — 4 leads need attention`,
+    installer:`2 active jobs today · Hardie Hotline ready`,
+    dealer:`${a.role.split('·')[1]?.trim() || 'Dashboard'} · $4,200 co-op available`,
+    distributor:`Western Territory · Q4 on track at 84%`,
+    retail:`National Home Center Pro · 6 staff pending certification`,
+  };
+  document.getElementById('topbar').innerHTML = `
+    <div class="topbar-title">${greetings[aud]}</div>
+    <div class="topbar-right">
+      <div class="topbar-icon-btn">🔍</div>
+      <div class="topbar-icon-btn">🔔<div class="notif-dot"></div></div>
+      <div class="user-av" style="background:${a.avatarBg};width:32px;height:32px;border-radius:50%;font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center">${a.initials}</div>
+    </div>`;
+}
+
+function buildWelcomeBanner() {
+  const a = audiences[aud];
+  return `<div class="welcome-banner">
+    <div class="wb-text">
+      <div class="wb-greeting">Welcome back</div>
+      <div class="wb-name">${a.name}</div>
+      <div class="wb-sub">${a.role}</div>
+      <div class="wb-brands">${a.brands.map(b=>`<span class="wb-brand-tag">${b}</span>`).join('')}</div>
+    </div>
+    <div class="wb-tier">
+      <div class="wb-tier-label">Current tier</div>
+      <div class="wb-tier-name">${a.tier}</div>
+      <div class="wb-tier-sub">${a.tierPct}% to ${a.tierTo}</div>
+    </div>
+  </div>`;
+}
+
+function buildStats(stats) {
+  return `<div class="stats-row">${stats.map(s=>`
+    <div class="stat-card">
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value">${s.value}</div>
+      ${s.change?`<div class="stat-change ${s.up?'up':'down'}">${s.change}</div>`:`<div class="stat-sub">${s.sub||''}</div>`}
+      <div class="stat-bar" style="background:${s.color}"></div>
+    </div>`).join('')}</div>`;
+}
+
+function buildCapHub() {
+  const active = audActiveCaps[aud];
+  return `<div class="cap-hub">
+    <div class="cap-hub-header">
+      <div>
+        <div class="cap-hub-title">Your capability hub</div>
+        <div class="cap-hub-sub">One portal · access to all your tools across both brands</div>
+      </div>
+      <span class="cap-hub-badge">${active.length} of 8 active</span>
+    </div>
+    <div class="cap-hub-grid">${allCaps.map((c,i)=>`
+      <div class="cap-hub-item">
+        <div class="cap-hub-icon">${c.icon}</div>
+        <div class="cap-hub-name">${c.name}</div>
+        <div class="cap-hub-avail">
+          ${active.includes(i)?'<span class="cap-hub-dot-on"></span>Available':'<span class="cap-hub-dot-off"></span>Not in plan'}
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* ── CONTRACTOR CONTENT ── */
+function renderContractorContent() {
+  const stats = [
+    {label:'Open leads', value:'4', sub:'2 new today', color:'#dc2626'},
+    {label:'YTD installs', value:'38', change:'↑ +6 this month', up:true, color:'#2d6a4f'},
+    {label:'Rewards balance', value:'$2,840', sub:'ready to redeem', color:'#f59e0b'},
+    {label:'Certifications', value:'3/4', sub:'1 pending', color:'#6366f1'},
+  ];
+  return buildWelcomeBanner() + buildStats(stats) + `
+    <div class="qa-row">
+      <div class="qa-btn"><div class="qa-icon">📋</div><div class="qa-label">View leads</div></div>
+      <div class="qa-btn"><div class="qa-icon">📦</div><div class="qa-label">Order samples</div></div>
+      <div class="qa-btn"><div class="qa-icon">🛍️</div><div class="qa-label">Promo store</div></div>
+      <div class="qa-btn"><div class="qa-icon">📣</div><div class="qa-label">Marketing kit</div></div>
+      <div class="qa-btn"><div class="qa-icon">⭐</div><div class="qa-label">Redeem rewards</div></div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="sec-hdr">Active leads <span class="sec-link">View all 12 →</span></div>
+        ${[
+          {i:'DM', n:'David Mitchell', a:'4821 Oak Ave, Springfield', v:'$18,200', t:'hot', d:'Full exterior — siding + trim replacement', src:'hover', srcLabel:'Hover Visualizer'},
+          {i:'SR', n:'Sandra Rivera',  a:'1203 Pine St, Lakewood',   v:'$9,800',  t:'warm', d:'Deck + composite railing combo', src:'web', srcLabel:'Website form'},
+          {i:'JK', n:'James Ko',       a:'887 Maple Dr, Riverside',  v:'$24,500', t:'new',  d:'New construction — full exterior package', src:'hover', srcLabel:'Hover Visualizer'},
+          {i:'AL', n:'Amy Liu',        a:'2341 Elm Blvd, Millbrook', v:'$6,200',  t:'new',  d:'Partial siding repair + repaint', src:'ref', srcLabel:'Referral'},
+        ].map(l=>`
+        <div class="lead-card">
+          <div class="lead-top">
+            <div class="lead-av" style="background:${l.t==='hot'?'#dc2626':l.t==='warm'?'#c2410c':'#2d6a4f'}">${l.i}</div>
+            <div class="lead-info">
+              <div class="lead-name-row">
+                <div class="lead-name">${l.n}</div>
+                <span class="lead-temp temp-${l.t}">${l.t==='hot'?'🔥 HOT':l.t==='warm'?'🌡 WARM':'🆕 NEW'}</span>
+              </div>
+              <div class="lead-addr">${l.a}</div>
+            </div>
+          </div>
+          <div class="lead-desc">${l.d}</div>
+          <div class="lead-footer">
+            <span class="lead-source src-${l.src}">${l.srcLabel}</span>
+            <div class="lead-value">${l.v}</div>
+            <span class="lead-cta">Open →</span>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div>
+        <div class="sec-hdr">Program status</div>
+        <div style="background:#1f5c34;border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;color:#fff">
+          <div style="font-size:9px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">Current tier</div>
+          <div style="font-size:18px;font-weight:800;color:#4ade80;margin-bottom:2px">Alliance Gold ★</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:10px">$48,200 YTD verified installs</div>
+          <div style="background:rgba(255,255,255,0.15);border-radius:999px;height:6px;margin-bottom:4px">
+            <div style="width:72%;height:6px;border-radius:999px;background:#4ade80"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.5)">
+            <span>$48.2K</span><span>$67K → Platinum</span>
+          </div>
+        </div>
+        <div class="sec-hdr">Rewards balance</div>
+        <div class="rewards-card">
+          <div class="rc-value">$2,840</div>
+          <div class="rc-label">Available to redeem</div>
+          <div class="rc-split">
+            <span class="rc-brand-pill rcp-jh">James Hardie: $1,620</span>
+            <span class="rc-brand-pill rcp-tt">TimberTech: $1,220</span>
+          </div>
+          <div class="rc-spend-label">Spend on</div>
+          <div class="rc-spend-tags">
+            <span class="rc-spend-tag">Marketing materials</span>
+            <span class="rc-spend-tag">Promo store</span>
+            <span class="rc-spend-tag">Training</span>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sec-hdr">Notifications</div>
+        <div class="card"><div class="card-inner" style="padding-top:6px">
+          ${[
+            ['#dc2626','New lead from Hover Visualizer — Springfield, $22K','1h ago'],
+            ['#2d6a4f','Rewards: $340 added — James Hardie order #JH-8821','Yesterday'],
+            ['#1d4ed8','Cert ready: TimberTech Deck Pro — take exam now','2 days ago'],
+          ].map(([c,t,d])=>`<div class="notif-item"><div class="nd" style="background:${c}"></div><div class="notif-text">${t}</div><div class="notif-time">${d}</div></div>`).join('')}
+        </div></div>
+      </div>
+    </div>
+    <div class="sec-hdr">My tools <span class="sec-link">Manage →</span></div>
+    <div class="tools-grid">
+      ${[
+        {e:'🏗️', n:'3D Deck Designer', b:'TimberTech'},
+        {e:'🏠', n:'Home Visualizer', b:'James Hardie'},
+        {e:'📣', n:'Marketing Hub', b:'Both brands'},
+        {e:'📦', n:'Sample Ordering', b:'Both brands'},
+        {e:'🛍️', n:'Promo Store', b:'Both brands'},
+        {e:'🎓', n:'Training Hub', b:'Certifications'},
+      ].map(t=>`<div class="tool-item"><div class="tool-emoji">${t.e}</div><div class="tool-name">${t.n}</div><div class="tool-brand">${t.b}</div></div>`).join('')}
+    </div>
+    ${buildCapHub()}`;
+}
+
+/* ── INSTALLER CONTENT ── */
+function renderInstallerContent() {
+  const stats = [
+    {label:'Active jobs', value:'2', sub:'1 starts today', color:'#f59e0b'},
+    {label:'Cert score', value:'94%', change:'↑ +3% this quarter', up:true, color:'#2d6a4f'},
+    {label:'Installs this month', value:'7', sub:'jobs completed', color:'#1b4332'},
+    {label:'Toolbelt matches', value:'3', sub:'job matches', color:'#6366f1'},
+  ];
+  return buildWelcomeBanner() + buildStats(stats) + `
+    <div class="qa-row">
+      <div class="qa-btn"><div class="qa-icon">📞</div><div class="qa-label">Hardie Hotline</div></div>
+      <div class="qa-btn"><div class="qa-icon">📋</div><div class="qa-label">Job checklist</div></div>
+      <div class="qa-btn"><div class="qa-icon">📷</div><div class="qa-label">Photo log</div></div>
+      <div class="qa-btn"><div class="qa-icon">📖</div><div class="qa-label">Install Playbook</div></div>
+      <div class="qa-btn"><div class="qa-icon">🧰</div><div class="qa-label">Toolbelt</div></div>
+    </div>
+    <div class="two-col-eq">
+      <div>
+        <div class="sec-hdr">Hardie Hotline — AI Jobsite Assistant</div>
+        <div class="hotline-panel" style="margin-bottom:12px">
+          <div class="hotline-header">
+            <div class="hotline-icon">🤖</div>
+            <div>
+              <div class="hotline-title">Hardie Hotline</div>
+              <div class="hotline-status"><span class="hotline-status-dot"></span>AI-powered · Ready</div>
+            </div>
+          </div>
+          <div class="hotline-body">
+            <div class="hotline-msg hm-user"><div class="hm-bubble hm-q">"What's the correct nailing pattern for HardiePlank in a coastal zone?"</div></div>
+            <div class="hotline-msg"><div class="hm-ai-av">AI</div><div class="hm-bubble hm-a">Coastal zones require corrosion-resistant nails at 16" OC with a 6-nail pattern per stud. See <strong>Installation Guide §4.2</strong> — I can pull the full diagram for you.</div></div>
+            <div class="hotline-msg hm-user"><div class="hm-bubble hm-q">"Show me the flashing detail for this window"</div></div>
+            <div class="hotline-msg"><div class="hm-ai-av">AI</div><div class="hm-bubble hm-a">Here's the standard flashing sequence: install self-adhesive flashing tape → pan flashing → HardieWrap® → caulk all penetrations. Want me to send the diagram to your phone?</div></div>
+            <div class="hotline-input">
+              <span class="hi-text">Ask anything about install, specs, or troubleshooting...</span>
+              <div class="hi-actions"><span class="hi-btn">📷</span><span class="hi-btn">🎤</span><span style="font-size:11px;background:#1f5c34;color:#fff;padding:4px 10px;border-radius:5px;cursor:pointer;font-weight:600">Ask</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="sec-hdr">Install Playbook — Current job</div>
+        <div class="card"><div class="card-inner">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <div style="background:var(--jh-light);border-radius:6px;padding:6px 10px;flex:1">
+              <div style="font-size:11px;font-weight:700;color:var(--jh-green)">4821 Oak Ave — Day 1 of 3</div>
+              <div style="font-size:10px;color:var(--text3)">HardiePlank® 6.25" · 2,400 sq ft · Coastal zone</div>
+            </div>
+            <span style="font-size:9px;background:#1f5c34;color:#fff;padding:4px 8px;border-radius:5px;font-weight:600">IN PROGRESS</span>
+          </div>
+          ${[
+            ['✅','Substrate inspection complete','Done'],
+            ['✅','HardieWrap® moisture barrier installed','Done'],
+            ['🔄','Starter strip — 1st course','In progress'],
+            ['⬜','Main field installation — courses 2–24','Pending'],
+            ['⬜','Trim & corner details','Pending'],
+            ['⬜','Final inspection & photo log','Pending'],
+          ].map(([i,t,s])=>`<div style="display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:14px">${i}</span>
+            <span style="font-size:11px;color:${s==='Done'?'var(--text3)':s==='In progress'?'var(--text)':'var(--text4)'};${s==='Done'?'text-decoration:line-through':''};flex:1">${t}</span>
+            <span style="font-size:9px;color:${s==='Done'?'var(--jh-green)':s==='In progress'?'#c2410c':'var(--text4)'};font-weight:600">${s}</span>
+          </div>`).join('')}
+        </div></div>
+      </div>
+      <div>
+        <div class="sec-hdr">Recent project photos</div>
+        <div class="proj-photos">
+          ${[
+            {bg:'ppc-siding',  addr:'4821 Oak Ave',    meta:'HardiePlank® · Nov 12',  ai:'Hotline: nailing Q'},
+            {bg:'ppc-deck',    addr:'887 Maple Dr',    meta:'TimberTech Deck · Nov 8', ai:'Hotline: flashing Q'},
+            {bg:'ppc-trim',    addr:'1203 Pine St',    meta:'Trim detail · Nov 3',     ai:null},
+            {bg:'ppc-install', addr:'2341 Elm Blvd',   meta:'Install day 2 · Oct 28',  ai:'Hotline: gap spacing'},
+          ].map(p=>`<div class="proj-photo-card">
+            <div class="ppc-bg ${p.bg}"><div class="ppc-lines"></div>
+              <div class="ppc-overlay"><div class="ppc-overlay-text">🔍 View project details</div></div>
+            </div>
+            <div class="ppc-footer">
+              <div class="ppc-addr">${p.addr}</div>
+              <div class="ppc-meta">${p.meta}</div>
+              ${p.ai?`<div class="ppc-ai-tag"><span class="ppc-ai-tag-text">🤖 ${p.ai}</span></div>`:''}
+            </div>
+          </div>`).join('')}
+        </div>
+        <div class="sec-hdr">Toolbelt Marketplace</div>
+        <div class="toolbelt-panel">
+          <div class="toolbelt-header">
+            <span style="font-size:18px">🧰</span>
+            <div><div class="toolbelt-title">Toolbelt — Job Matches</div><div class="toolbelt-sub">3 opportunities near you</div></div>
+          </div>
+          ${[
+            {i:'RP', n:'Rivera Pro Group', c:'JH Elite · 5 yrs', d:'Springfield area · 2 siding jobs available', bg:'#2d6a4f', t:['HardiePlank®','$2,400/job']},
+            {i:'SB', n:'Summit Builds', c:'JH Gold · 3 yrs',    d:'Lakewood · 1 deck + siding combo', bg:'#1b4332', t:['AZEK Deck','Combo job']},
+          ].map(m=>`<div class="tb-match">
+            <div class="tb-match-top">
+              <div class="tb-av" style="background:${m.bg}">${m.i}</div>
+              <div style="flex:1"><div class="tb-name">${m.n}</div><span class="tb-cert">${m.c}</span></div>
+            </div>
+            <div class="tb-detail">${m.d}</div>
+            <div class="tb-footer">${m.t.map(t=>`<span class="tb-tag">${t}</span>`).join('')}<span class="tb-cta">Apply →</span></div>
+          </div>`).join('')}
+        </div>
+        <div class="divider"></div>
+        <div class="sec-hdr">Certifications</div>
+        <div class="card"><div class="card-inner" style="padding-top:6px">
+          ${[
+            {i:'🏅', n:'JH HardiePlank® Installer', b:'James Hardie', s:'cs-done'},
+            {i:'🏅', n:'JH Coastal Zone Certification', b:'James Hardie', s:'cs-done'},
+            {i:'🏅', n:'JH Trim & Fascia Pro', b:'James Hardie', s:'cs-done'},
+            {i:'⏳', n:'TimberTech Deck Pro Level 1', b:'TimberTech', s:'cs-prog'},
+          ].map(c=>`<div class="cert-row">
+            <div class="cert-icon" style="background:var(--bg)">${c.i}</div>
+            <div style="flex:1"><div class="cert-name">${c.n}</div><div class="cert-brand">${c.b}</div></div>
+            <span class="cert-status ${c.s}">${c.s==='cs-done'?'Earned':'In progress'}</span>
+          </div>`).join('')}
+        </div></div>
+      </div>
+    </div>
+    ${buildCapHub()}`;
+}
+
+/* ── DEALER CONTENT ── */
+function renderDealerContent() {
+  const stats = [
+    {label:'Co-op available', value:'$4,200', change:'↑ +$800 this quarter', up:true, color:'#2d6a4f'},
+    {label:'Pending orders', value:'3', sub:'2 in transit', color:'#1d4ed8'},
+    {label:'YTD purchases', value:'$82.4K', change:'↑ +21% vs last year', up:true, color:'#1b4332'},
+    {label:'Showroom displays', value:'8', sub:'2 need refresh', color:'#6366f1'},
+  ];
+  return buildWelcomeBanner() + buildStats(stats) + `
+    <div class="qa-row">
+      <div class="qa-btn"><div class="qa-icon">📦</div><div class="qa-label">Place order</div></div>
+      <div class="qa-btn"><div class="qa-icon">💵</div><div class="qa-label">Co-op funds</div></div>
+      <div class="qa-btn"><div class="qa-icon">📣</div><div class="qa-label">Get assets</div></div>
+      <div class="qa-btn"><div class="qa-icon">◎</div><div class="qa-label">Order samples</div></div>
+      <div class="qa-btn"><div class="qa-icon">🎓</div><div class="qa-label">Train team</div></div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="sec-hdr">Co-op fund management <span class="sec-link">Redeem funds →</span></div>
+        <div class="coop-card" style="margin-bottom:12px">
+          <div class="coop-split">
+            <div class="coop-brand-block coop-bb-jh">
+              <div class="coop-brand-label">James Hardie</div>
+              <div class="coop-amount">$2,800</div>
+              <div class="coop-avail">available now</div>
+            </div>
+            <div class="coop-brand-block coop-bb-tt">
+              <div class="coop-brand-label">TimberTech/AZEK</div>
+              <div class="coop-amount">$1,400</div>
+              <div class="coop-avail">available now</div>
+            </div>
+          </div>
+          <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:5px">Q4 Purchase Progress → Elite Dealer</div>
+          <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:60%"></div></div>
+          <div class="prog-labels"><span>$82,400 YTD</span><span>$137,000 target</span></div>
+        </div>
+        <div class="sec-hdr">Recent orders <span class="sec-link">View all →</span></div>
+        <div class="card"><div class="card-inner" style="padding-top:4px">
+          ${[
+            ['#JH-8821','HardiePlank® 6.25" — Cedar Mill','James Hardie','$12,400','os-transit'],
+            ['#TT-4402','AZEK Harvest Collection Decking','TimberTech','$8,200','os-delivered'],
+            ['#JH-8803','HardieTrim® Boards Primed','James Hardie','$3,800','os-delivered'],
+            ['#TT-4390','TimberTech Fascia — White Ash','TimberTech','$1,600','os-pending'],
+          ].map(([id,d,b,a,s])=>`<div class="order-row">
+            <div class="order-id">${id}</div>
+            <div class="order-brand-dot" style="background:${b==='James Hardie'?'var(--jh-green)':'var(--tt-red)'}"></div>
+            <div class="order-desc">${d}</div>
+            <div class="order-amt">${a}</div>
+            <span class="order-status ${s}">${s==='os-transit'?'In transit':s==='os-delivered'?'Delivered':'Pending'}</span>
+          </div>`).join('')}
+        </div></div>
+      </div>
+      <div>
+        <div class="sec-hdr">Showroom & merchandising</div>
+        <div class="card" style="margin-bottom:12px"><div class="card-inner" style="padding-top:6px">
+          ${[
+            ['HardiePlank® End Cap Display','Active','2px solid var(--jh-green)','var(--jh-light)'],
+            ['AZEK Deck Sample Station','Active','2px solid var(--tt-red)','var(--tt-light)'],
+            ['Trim & Moulding Wall','Needs refresh','2px solid #f59e0b','#fffbeb'],
+            ['TimberTech Composite Display','Inactive','2px solid var(--border2)','var(--bg)'],
+          ].map(([n,s,bdr,bg])=>`<div style="border-left:${bdr};background:${bg};border-radius:0 var(--radius) var(--radius) 0;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center">
+            <div style="flex:1;font-size:11px;font-weight:500;color:var(--text)">${n}</div>
+            <span style="font-size:9px;font-weight:600;color:${s==='Active'?'var(--jh-green)':s==='Needs refresh'?'#c2410c':'var(--text4)'}">${s}</span>
+          </div>`).join('')}
+        </div></div>
+        <div class="sec-hdr">Team training</div>
+        <div class="card"><div class="card-inner" style="padding-top:6px">
+          <div style="display:flex;gap:12px;margin-bottom:10px">
+            <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--jh-green)">6</div><div style="font-size:9px;color:var(--text4)">Certified</div></div>
+            <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:#c2410c">3</div><div style="font-size:9px;color:var(--text4)">In progress</div></div>
+          </div>
+          ${[
+            {n:'JH Product Knowledge',s:'cs-done'},
+            {n:'TT Decking Fundamentals',s:'cs-done'},
+            {n:'Trim & Installation Basics',s:'cs-prog'},
+            {n:'Color & Aesthetics Selling',s:'cs-prog'},
+          ].map(c=>`<div class="cert-row"><div class="cert-name">${c.n}</div><span class="cert-status ${c.s}">${c.s==='cs-done'?'Complete':'In progress'}</span></div>`).join('')}
+        </div></div>
+      </div>
+    </div>
+    ${buildCapHub()}`;
+}
+
+/* ── DISTRIBUTOR CONTENT ── */
+function renderDistributorContent() {
+  const stats = [
+    {label:'Q4 YTD revenue', value:'$2.1M', change:'↑ +16% vs target', up:true, color:'#2d6a4f'},
+    {label:'Active dealers', value:'47', sub:'12 need attention', color:'#1d4ed8'},
+    {label:'Co-op pipeline', value:'$68K', sub:'pending approval', color:'#f59e0b'},
+    {label:'Rebate earned', value:'$28.4K', change:'↑ +$4.2K vs Q3', up:true, color:'#1b4332'},
+  ];
+  return buildWelcomeBanner() + buildStats(stats) + `
+    <div class="qa-row">
+      <div class="qa-btn"><div class="qa-icon">👥</div><div class="qa-label">Channel accounts</div></div>
+      <div class="qa-btn"><div class="qa-icon">📦</div><div class="qa-label">Orders</div></div>
+      <div class="qa-btn"><div class="qa-icon">💵</div><div class="qa-label">Co-op pipeline</div></div>
+      <div class="qa-btn"><div class="qa-icon">⭐</div><div class="qa-label">Rebate tracker</div></div>
+      <div class="qa-btn"><div class="qa-icon">📊</div><div class="qa-label">Analytics</div></div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="sec-hdr">Channel account health <span class="sec-link">Full report →</span></div>
+        <div class="card"><div class="card-inner" style="padding-top:4px">
+          ${[
+            ['Summit Building Supply','$82,400','Premier','On track','var(--jh-green)'],
+            ['Westbrook Lumber Co.','$64,200','Premier','On track','var(--jh-green)'],
+            ['Riverside Home Center','$38,800','Standard','Needs attention','#c2410c'],
+            ['Lakeside Builders Supply','$22,100','Standard','At risk','#dc2626'],
+            ['Meadow Building Supply','$18,600','Standard','On track','var(--jh-green)'],
+          ].map(([n,v,t,s,c])=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
+            <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--text)">${n}</div><div style="font-size:9px;color:var(--text4)">${t} dealer</div></div>
+            <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:var(--text)">${v}</div><div style="font-size:10px;font-weight:600;color:${c}">${s}</div></div>
+          </div>`).join('')}
+        </div></div>
+      </div>
+      <div>
+        <div class="sec-hdr">Co-op pipeline</div>
+        <div class="coop-card" style="margin-bottom:12px">
+          <div style="font-size:26px;font-weight:800;color:var(--text)">$68,200</div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:12px">Pending dealer approval</div>
+          ${[
+            ['Summit Building Supply','$18,400','Approved'],
+            ['Westbrook Lumber','$14,200','Under review'],
+            ['Riverside Home Center','$22,100','Pending'],
+            ['Others (9 dealers)','$13,500','Various'],
+          ].map(([n,v,s])=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
+            <div style="flex:1;font-size:11px;color:var(--text2)">${n}</div>
+            <div style="font-size:11px;font-weight:700;color:var(--text)">${v}</div>
+            <span style="font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;background:${s==='Approved'?'var(--jh-light)':s==='Under review'?'#fff7ed':'#f3f4f6'};color:${s==='Approved'?'var(--jh-green)':s==='Under review'?'#c2410c':'var(--text3)'}">${s}</span>
+          </div>`).join('')}
+        </div>
+        <div class="sec-hdr">Q4 rebate tracker</div>
+        <div class="card"><div class="card-inner">
+          <div class="prog-bar-bg" style="margin-bottom:8px"><div class="prog-bar-fill" style="width:84%"></div></div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1;text-align:center;background:var(--bg);border-radius:var(--radius);padding:8px">
+              <div style="font-size:18px;font-weight:800;color:var(--text)">$28.4K</div>
+              <div style="font-size:10px;color:var(--text3)">Earned this Q</div>
+            </div>
+            <div style="flex:1;text-align:center;background:var(--jh-light);border-radius:var(--radius);padding:8px">
+              <div style="font-size:18px;font-weight:800;color:var(--jh-green)">$11.6K</div>
+              <div style="font-size:10px;color:var(--jh-green)">Projected remaining</div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+    ${buildCapHub()}`;
+}
+
+/* ── RETAIL CONTENT ── */
+function renderRetailContent() {
+  const stats = [
+    {label:'Sell-through rate', value:'73%', change:'↑ +8% vs last period', up:true, color:'#2d6a4f'},
+    {label:'Active SKUs', value:'124', sub:'8 new additions', color:'#1d4ed8'},
+    {label:'Staff certified', value:'18/24', sub:'6 pending', color:'#f59e0b'},
+    {label:'Display compliance', value:'91%', sub:'across locations', color:'#1b4332'},
+  ];
+  return buildWelcomeBanner() + buildStats(stats) + `
+    <div class="qa-row">
+      <div class="qa-btn"><div class="qa-icon">📦</div><div class="qa-label">Product catalog</div></div>
+      <div class="qa-btn"><div class="qa-icon">🎓</div><div class="qa-label">Staff training</div></div>
+      <div class="qa-btn"><div class="qa-icon">📣</div><div class="qa-label">Get assets</div></div>
+      <div class="qa-btn"><div class="qa-icon">🖼️</div><div class="qa-label">Display tools</div></div>
+      <div class="qa-btn"><div class="qa-icon">📊</div><div class="qa-label">Sell reports</div></div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="sec-hdr">Category sell-through <span class="sec-link">Full report →</span></div>
+        <div class="card"><div class="card-inner">
+          ${[
+            ['HardiePlank® Lap Siding','84%','var(--jh-green)'],
+            ['HardieTrim® Boards','71%','var(--jh-green2)'],
+            ['AZEK Composite Decking','68%','var(--tt-red)'],
+            ['TimberTech Edge Prime','62%','var(--tt-red2)'],
+            ['HardieShingle® Siding','77%','var(--jh-green3)'],
+          ].map(([n,v,c])=>`<div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:11px;color:var(--text2)">${n}</span>
+              <span style="font-size:11px;font-weight:700;color:var(--text)">${v}</span>
+            </div>
+            <div class="prog-bar-bg"><div style="width:${v};height:6px;border-radius:999px;background:${c}"></div></div>
+          </div>`).join('')}
+        </div></div>
+      </div>
+      <div>
+        <div class="sec-hdr">Staff training status</div>
+        <div class="card" style="margin-bottom:12px"><div class="card-inner">
+          <div style="display:flex;gap:10px;margin-bottom:10px">
+            <div style="text-align:center;flex:1;background:var(--jh-light);border-radius:var(--radius);padding:8px"><div style="font-size:22px;font-weight:800;color:var(--jh-green)">18</div><div style="font-size:9px;color:var(--text3)">Certified</div></div>
+            <div style="text-align:center;flex:1;background:#fff7ed;border-radius:var(--radius);padding:8px"><div style="font-size:22px;font-weight:800;color:#c2410c">6</div><div style="font-size:9px;color:var(--text3)">In progress</div></div>
+          </div>
+          ${[
+            {n:'JH Product Specialist L1',s:'cs-done'},
+            {n:'TT Decking Expert Cert',s:'cs-done'},
+            {n:'Exterior Design Selling',s:'cs-prog'},
+            {n:'JH HardiePlank® Advanced',s:'cs-prog'},
+            {n:'TT Premium Collection',s:'cs-locked'},
+          ].map(c=>`<div class="cert-row"><div class="cert-name">${c.n}</div><span class="cert-status ${c.s}">${c.s==='cs-done'?'Complete':c.s==='cs-prog'?'In progress':'Not started'}</span></div>`).join('')}
+        </div></div>
+        <div class="sec-hdr">Featured tools</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
+          ${[['🖼️','Visual Sell Guides'],['📦','Display Planner'],['📣','Co-branded Ads'],['📋','Spec Sheets'],['🏠','Visualizer Tool'],['🎓','Training Hub']].map(([e,n])=>`
+          <div class="tool-item"><div class="tool-emoji">${e}</div><div class="tool-name">${n}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>
+    ${buildCapHub()}`;
+}
+
+/* ── MOBILE RENDERS ── */
+function renderMobile() {
+  const a = audiences[aud];
+  const renders = {
+    contractor: renderContractorMobile,
+    installer:  renderInstallerMobile,
+    dealer:     renderDealerMobile,
+    distributor:renderDistributorMobile,
+    retail:     renderRetailMobile,
+  };
+  document.getElementById('mobilePortal').innerHTML = renders[aud]();
+}
+
+function mobileShell(content, navItems, title) {
+  return `
+    <div class="mobile-header">
+      <div class="mh-logo-icon">JH</div>
+      <div class="mh-title">${title}</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.7)">🔔</div>
+    </div>
+    <div class="mobile-content">${content}</div>
+    <div class="mobile-bottom-nav">
+      ${navItems.map((n,i)=>`<div class="mbn-item${i===0?' active':''}"><div class="mbn-icon">${n[0]}</div><div class="mbn-label">${n[1]}</div></div>`).join('')}
+    </div>`;
+}
+
+function renderContractorMobile() {
+  return mobileShell(`
+    <div style="background:var(--jh-green);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;color:#fff;display:flex;align-items:center;gap:12px">
+      <div><div style="font-size:10px;color:rgba(255,255,255,0.55);margin-bottom:2px">ALLIANCE GOLD ★</div><div style="font-size:16px;font-weight:800">Marcus Rivera</div><div style="font-size:11px;color:rgba(255,255,255,0.65)">$2,840 rewards · 4 open leads</div>
+        <div style="display:flex;gap:5px;margin-top:6px"><span style="font-size:9px;background:rgba(255,255,255,0.15);color:#fff;padding:2px 7px;border-radius:4px;border:1px solid rgba(255,255,255,0.2)">James Hardie</span><span style="font-size:9px;background:rgba(255,255,255,0.15);color:#fff;padding:2px 7px;border-radius:4px;border:1px solid rgba(255,255,255,0.2)">TimberTech</span></div>
+      </div>
+      <div style="margin-left:auto;text-align:center;background:rgba(255,255,255,0.1);border-radius:var(--radius);padding:8px 12px"><div style="font-size:22px;font-weight:800;color:#4ade80">72%</div><div style="font-size:9px;color:rgba(255,255,255,0.5)">to Platinum</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      ${[['4','Open leads','#dc2626'],['$2,840','Rewards','var(--jh-green)'],['38','Installs','#1b4332'],['3/4','Certs','#6366f1']].map(([v,l,c])=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-value" style="font-size:18px;color:${c}">${v}</div></div>`).join('')}
+    </div>
+    <div class="sec-hdr">New leads</div>
+    ${[{i:'DM',n:'David Mitchell',v:'$18,200',t:'hot',s:'4821 Oak Ave, Springfield'},{i:'SR',n:'Sandra Rivera',v:'$9,800',t:'warm',s:'1203 Pine St, Lakewood'}].map(l=>`
+    <div class="lead-card" style="margin-bottom:8px">
+      <div class="lead-top"><div class="lead-av" style="background:${l.t==='hot'?'#dc2626':'#c2410c'}">${l.i}</div>
+      <div class="lead-info"><div class="lead-name-row"><div class="lead-name">${l.n}</div><span class="lead-temp temp-${l.t}">${l.t==='hot'?'🔥 HOT':'🌡 WARM'}</span></div><div class="lead-addr">${l.s}</div></div>
+      <div class="lead-value">${l.v}</div></div>
+    </div>`).join('')}
+    <div class="sec-hdr" style="margin-top:14px">Quick tools</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+      ${[['📋','Leads'],['📦','Samples'],['🛍️','Promo'],['📣','Marketing']].map(([e,n])=>`<div class="tool-item"><div class="tool-emoji" style="font-size:18px">${e}</div><div class="tool-name">${n}</div></div>`).join('')}
+    </div>`,
+    [['🏠','Home'],['📋','Leads'],['⭐','Rewards'],['🎓','Training']]);
+}
+
+function renderInstallerMobile() {
+  return mobileShell(`
+    <div style="background:var(--jh-green);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;color:#fff">
+      <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-bottom:2px">ELITE CERTIFIED INSTALLER</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:6px">Carlos Mendez</div>
+      <div style="background:rgba(255,255,255,0.1);border-radius:var(--radius);padding:10px;display:flex;align-items:center;gap:10px;cursor:pointer">
+        <div style="font-size:22px">🤖</div>
+        <div><div style="font-size:12px;font-weight:700">Hardie Hotline</div><div style="font-size:10px;color:rgba(255,255,255,0.6)">AI jobsite support · tap to ask</div></div>
+        <span style="margin-left:auto;font-size:10px;background:#4ade80;color:#1c3829;padding:3px 9px;border-radius:5px;font-weight:700">Ready</span>
+      </div>
+    </div>
+    <div class="sec-hdr">Today's jobs</div>
+    ${[{a:'4821 Oak Ave, Springfield',p:'HardiePlank® 2,400 sq ft',d:'Day 1 of 3 · Starts 7:30am',c:'James Hardie'},{a:'1203 Pine St, Lakewood',p:'AZEK® Deck 480 sq ft',d:'Starts 1:00pm',c:'TimberTech'}].map(j=>`
+    <div class="card" style="margin-bottom:8px"><div class="card-inner" style="padding:10px 12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="font-size:12px;font-weight:600;color:var(--text)">${j.a}</div>
+        <span style="font-size:9px;padding:2px 7px;border-radius:4px;background:${j.c==='James Hardie'?'var(--jh-light)':'var(--tt-light)'};color:${j.c==='James Hardie'?'var(--jh-green)':'var(--tt-red)'};font-weight:600">${j.c}</span>
+      </div>
+      <div style="font-size:10px;color:var(--text3)">${j.p} · ${j.d}</div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <div style="flex:1;background:var(--jh-green);color:#fff;border-radius:5px;padding:7px;text-align:center;font-size:11px;font-weight:600">Install guide</div>
+        <div style="flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:5px;padding:7px;text-align:center;font-size:11px;font-weight:600">Hotline 🤖</div>
+      </div>
+    </div></div>`).join('')}
+    <div class="sec-hdr" style="margin-top:14px">Toolbelt — Job matches</div>
+    <div class="toolbelt-panel">
+      <div class="toolbelt-header"><span style="font-size:16px">🧰</span><div><div class="toolbelt-title">3 matches near you</div></div></div>
+      <div class="tb-match"><div class="tb-match-top"><div class="tb-av" style="background:var(--jh-green)">RP</div><div style="flex:1"><div class="tb-name">Rivera Pro Group</div><span class="tb-cert">JH Elite · 5 yrs</span></div></div><div class="tb-detail">Springfield · 2 siding jobs open</div><div class="tb-footer"><span class="tb-tag">HardiePlank®</span><span class="tb-tag">$2,400/job</span><span class="tb-cta">Apply →</span></div></div>
+    </div>`,
+    [['🔨','Jobs'],['📞','Hotline'],['🏅','Certs'],['🧰','Toolbelt']]);
+}
+
+function renderDealerMobile() {
+  return mobileShell(`
+    <div style="background:var(--jh-green);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;color:#fff">
+      <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-bottom:2px">SUMMIT BUILDING SUPPLY</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:8px">Sarah Chen</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:rgba(255,255,255,0.1);border-radius:var(--radius);padding:10px"><div style="font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:2px">JH CO-OP</div><div style="font-size:20px;font-weight:800;color:#4ade80">$2,800</div></div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:var(--radius);padding:10px"><div style="font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:2px">TT CO-OP</div><div style="font-size:20px;font-weight:800;color:#fca5a5">$1,400</div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      ${[['$82.4K','YTD purchases','var(--jh-green)'],['3','Pending orders','#1d4ed8'],['8','Showroom displays','var(--jh-green2)'],['6/9','Team certified','#f59e0b']].map(([v,l,c])=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-value" style="font-size:16px;color:${c}">${v}</div></div>`).join('')}
+    </div>
+    <div class="sec-hdr">Recent orders</div>
+    ${[['#JH-8821','HardiePlank® 6.25"','$12,400','os-transit'],['#TT-4402','AZEK Harvest Decking','$8,200','os-delivered']].map(([id,d,a,s])=>`
+    <div class="card" style="margin-bottom:8px"><div class="card-inner" style="padding:10px 12px;display:flex;align-items:center;gap:9px">
+      <div class="order-id">${id}</div><div style="flex:1;font-size:11px;color:var(--text2)">${d}</div><div style="font-size:11px;font-weight:700">${a}</div><span class="order-status ${s}">${s==='os-transit'?'Transit':'Done'}</span>
+    </div></div>`).join('')}`,
+    [['🏠','Home'],['📦','Orders'],['💵','Co-op'],['👤','Account']]);
+}
+
+function renderDistributorMobile() {
+  return mobileShell(`
+    <div style="background:var(--jh-green);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;color:#fff">
+      <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-bottom:2px">WESTERN DISTRIBUTION</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:6px">Tom Patel</div>
+      <div class="prog-bar-bg" style="margin-bottom:4px"><div style="width:84%;height:6px;border-radius:999px;background:#4ade80"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.6)"><span>$2.1M Q4</span><span>84% of $2.5M target</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      ${[['47','Active dealers','#1d4ed8'],['$68K','Co-op pipeline','#f59e0b'],['$28.4K','Rebate earned','var(--jh-green)'],['12','Need attention','#dc2626']].map(([v,l,c])=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-value" style="font-size:15px;color:${c}">${v}</div></div>`).join('')}
+    </div>
+    <div class="sec-hdr">Account health</div>
+    ${[['Summit Building Supply','$82,400','On track'],['Riverside Home Center','$38,800','Needs attention'],['Lakeside Builders','$22,100','At risk']].map(([n,v,s])=>`
+    <div class="card" style="margin-bottom:7px"><div class="card-inner" style="padding:9px 12px;display:flex;align-items:center;gap:9px">
+      <div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--text)">${n}</div><div style="font-size:10px;color:var(--text3)">${v} YTD</div></div>
+      <span style="font-size:9px;font-weight:600;color:${s==='On track'?'var(--jh-green)':s==='Needs attention'?'#c2410c':'#dc2626'}">${s}</span>
+    </div></div>`).join('')}`,
+    [['🏠','Home'],['👥','Accounts'],['💵','Co-op'],['⭐','Rebates']]);
+}
+
+function renderRetailMobile() {
+  return mobileShell(`
+    <div style="background:var(--jh-green);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;color:#fff">
+      <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-bottom:2px">NATIONAL HOME CENTER PRO</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:2px">Jennifer Brooks</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.65)">Category Manager · 6 staff pending training</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      ${[['73%','Sell-through','var(--jh-green)'],['124','Active SKUs','#1d4ed8'],['18/24','Staff certified','#f59e0b'],['91%','Display comp.','#1b4332']].map(([v,l,c])=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-value" style="font-size:16px;color:${c}">${v}</div></div>`).join('')}
+    </div>
+    <div class="sec-hdr">Staff training</div>
+    ${[{n:'JH Product Specialist L1',s:'cs-done'},{n:'TT Decking Expert Cert',s:'cs-done'},{n:'Exterior Design Selling',s:'cs-prog'}].map(c=>`
+    <div class="card" style="margin-bottom:7px"><div class="card-inner" style="padding:9px 12px;display:flex;align-items:center">
+      <div style="flex:1;font-size:11px;font-weight:500;color:var(--text)">${c.n}</div>
+      <span class="cert-status ${c.s}">${c.s==='cs-done'?'✓ Done':'In progress'}</span>
+    </div></div>`).join('')}
+    <div class="sec-hdr" style="margin-top:14px">Quick tools</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+      ${[['📦','Catalog'],['🎓','Training'],['📣','Assets'],['🖼️','Displays'],['📊','Reports'],['🏠','Visualizer']].map(([e,n])=>`<div class="tool-item"><div class="tool-emoji" style="font-size:18px">${e}</div><div class="tool-name">${n}</div></div>`).join('')}
+    </div>`,
+    [['🏠','Home'],['📦','Products'],['🎓','Training'],['📊','Reports']]);
+}
+
+const renderers = {
+  contractor:  renderContractorContent,
+  installer:   renderInstallerContent,
+  dealer:      renderDealerContent,
+  distributor: renderDistributorContent,
+  retail:      renderRetailContent,
+};
+
+function update() {
+  buildCapStrip();
+  if (view === 'desktop') {
+    buildSidebar();
+    buildTopbar();
+    document.getElementById('mainContent').innerHTML = renderers[aud]();
+    document.getElementById('mainContent').scrollTop = 0;
+  } else {
+    renderMobile();
+  }
+}
+
+function switchAud(a, btn) {
+  aud = a;
+  document.querySelectorAll('.demo-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  update();
+}
+
+function switchView(v, btn) {
+  view = v;
+  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('desktopWrap').style.display = v==='desktop'?'':'none';
+  document.getElementById('mobileWrap').style.display  = v==='mobile' ?'':'none';
+  update();
+}
+
+update();
+</script>
+</body>
+</html>
